@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+{% block body %}
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>User Login</title>
+        <link rel="stylesheet" type="text/css" href="static/style.css">
+    </head>
+    <body>
+        <form action="/logout" method="get">
+            <div class="col-lg-11 text-center text-info">
+                <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Successfully login!</h2>
+            </div>
+            <div class="mycenter">
+            <div class="mysign">
+                <div class="panel panel-success">
+                    <div class="panel-heading">RAM infomation</div>
+                    <ul class="list-group">
+                        <li class="list-group-item">Used percentage:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ram}}</li>
+                    </ul>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading">CPU infomation</div>
+
+                    <ul class="list-group">
+                        <li class="list-group-item">Cpu time percentage of user:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{user}}</li>
+                        <li class="list-group-item">Cpu time percentage of system:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{system}}</li>
+                    </ul>
+                </div>
+                <div class="col-lg-10">
+                    <button type="submit" class="btn btn-success col-lg-12">Logout</button>
+                </div>
+
+            </div>
+        </div>
+        </form>
+    </body>
+</html>
+{% endblock %}

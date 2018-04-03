@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+{% block body %}
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>User Login</title>
+        <link rel="stylesheet" type="text/css" href="static/style.css">
+    </head>
+    <body>
+        <form action="/register" method="post">
+            <div class="mycenter">
+            <div class="mysign">
+                <div class="col-lg-11 text-center text-info">
+                    <h2>&nbsp;&nbsp;&nbsp;Please Register</h2>
+                </div>
+                <div class="col-lg-10">
+                <input type="text" class="form-control" name="email" placeholder="Email" required autofocus/>
+                </div>
+                <div class="col-lg-10"></div>
+                <div class="col-lg-10">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
+                </div>
+                <div class="col-lg-10"></div>
+                <div class="col-lg-10">
+                    <input type="password" class="form-control" name="password2" placeholder="Password Again" required autofocus/>
+                </div>
+                <div class="col-lg-10"></div>
+                <div class="col-lg-10">
+                    <button type="submit" class="btn btn-success col-lg-12">Register</button>
+                </div>
+                <div class="col-lg-10"></div>
+                <div class="col-lg-11 text-center text-info">                    {% if message %}
+                    <p style="color:red">&nbsp;&nbsp;{{message}}</p>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+        </form>
+
+
+
+    </body>
+</html>
+{% endblock %}
