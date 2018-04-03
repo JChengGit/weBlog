@@ -1,6 +1,6 @@
 CREATE TABLE users (
 	id		serial	PRIMARY KEY,
-	passwd		int,
+	password		int,
 	name		text,
 	age		int,
 	followers	int	default 0,
