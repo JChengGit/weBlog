@@ -1,9 +1,20 @@
 <!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+{% block body %}
 <html>
 <head>
     <meta charset="utf-8" />
     <title>User Login</title>
     <link rel="stylesheet" type="text/css" href="static/home.css">
+    <style type="text/css">
+    	p {
+		    color:black;
+		    text-align:justify;
+		    text-indent:20px;
+		    font-style:normal;
+		    font-size:25px;
+		}
+    </style>
 </head>
 <body >
 
@@ -16,32 +27,39 @@
 </ul>
 
 <div style="padding:20px;margin-top:30px;height:1500px;">
-<h1 style="margin-left:160px">Successfully Login!</h1>
+	<h1 style="margin-left:160px">Successfully Login!</h1>
 
-<p style="margin-left:160px">
-<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
-To be completed.<br><br><br>
+    <div style="margin-top: 50px;margin-bottom: 50px;margin-right: 460px;margin-left: 160px">
+        <form action="/home" method="post">
+            <textarea class="form-control input-lg" name="content" placeholder="Type in your content" rows="4" ></textarea>
+             <button style="float: right" type="submit" class="btn btn-default">Post</button>
+        </form>
+    </div>
 
-</p>
+
+    <div style="margin: 50px 160px">
+
+        <p>{{postlist[0]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[0]}}</p><br><br>
+        <p>{{postlist[1]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[1]}}</p><br><br>
+        <p>{{postlist[2]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[2]}}</p><br><br>
+        <p>{{postlist[3]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[3]}}</p><br><br>
+        <p>{{postlist[4]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[4]}}</p><br><br>
+        <p>{{postlist[5]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[5]}}</p><br><br>
+        <p>{{postlist[6]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[6]}}</p><br><br>
+        <p>{{postlist[7]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[7]}}</p><br><br>
+        <p>{{postlist[8]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[8]}}</p><br><br>
+        <p>{{postlist[9]}}</p><br>
+        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[9]}}</p><br><br>
+    </div>
 
 </div> 
 
@@ -49,4 +67,4 @@ To be completed.<br><br><br>
 
 </body>
 </html>
-
+{% endblock %}

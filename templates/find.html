@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+{% block body %}
 <html>
 <head>
     <meta charset="utf-8" />
@@ -8,8 +10,8 @@
 <body>
 
 <ul>
-    <li style="margin-left:160px"><a class="active" href="/home">Home</a></li>
-    <li><a href="/find">Find</a></li>
+    <li style="margin-left:160px"><a href="/home">Home</a></li>
+    <li><a class="active" href="/find">Find</a></li>
     <li><a href="/favorates">Favorates</a></li>
     <li><a href="/follow">Follow</a></li>
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
@@ -46,3 +48,4 @@ To be completed.<br><br><br>
 
 </body>
 </html>
+{% endblock %}

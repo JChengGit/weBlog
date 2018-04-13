@@ -15,7 +15,20 @@ def index():
 def home():
     if 'current' not in session:
         return redirect('/login')
-    return render_template('home.html')
+
+    current_id = session['current']
+    conn = psycopg2.connect(dbname="weibo", user="postgres",password="456", host="127.0.0.1", port="5432")
+    cur = conn.cursor()
+    cur.execute("select content,create_at from posts where user_id=%s",(current_id,))
+    posts = cur.fetchall()
+    length = len(posts)
+    cnt = []
+    tmstp = []
+    for i in posts:
+        cnt.append(i[0])
+        tmstp.append(i[1])
+    print(cnt)
+    return render_template('home.html',postlist=cnt,tmstp=tmstp)
 
 @app.route('/home',methods=['POST'])
 def post():

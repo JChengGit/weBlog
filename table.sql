@@ -14,7 +14,7 @@ CREATE TABLE posts (
 	user_id		int	REFERENCES users,
 	repost_id	int	REFERENCES posts,
 	content		text not null,
-	create_at	timestamp
+	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE comments (
@@ -23,7 +23,7 @@ CREATE TABLE comments (
 	post_id		int	REFERENCES posts,
 	comment_id	int	REFERENCES comments,
 	content		text not null,
-	create_at	timestamp
+	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE follows (
@@ -35,7 +35,7 @@ CREATE TABLE follows (
 CREATE TABLE favorates (
 	user_id		int	REFERENCES users,
 	post_id		int	REFERENCES posts,
-	create_at	timestamp,
+	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	UNIQUE(user_id,post_id)
 );
 
