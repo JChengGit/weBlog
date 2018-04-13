@@ -10,29 +10,29 @@
     <body>
         <form action="/login" method="post">
             <div class="mycenter">
-            <div class="mysign">
-                <div class="col-lg-11 text-center text-info">
-                    <h2>Please login</h2>
-                </div>
-                <div class="col-lg-10">
-                <input type="text" class="form-control" name="name" placeholder="Username" required autofocus/>
-                </div>
-                <div class="col-lg-10"></div>
-                <div class="col-lg-10">
-                    <input type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
-                </div>
-                <div class="col-lg-10"></div>
-                <div class="col-lg-10"></div>
-                <div class="col-lg-10">
-                    <button type="submit" class="btn btn-success col-lg-12">login</button>
-                </div>
-                <div class="col-lg-10"></div>
-                <div class="col-lg-11 text-center text-info">                    {% if message %}
-                    <p style="color:red">&nbsp;&nbsp;{{message}}</p>
-                    {% endif %}
+                <div class="mysign">
+                    <div class="col-lg-11 text-center text-info">
+                        <h2>Please login</h2>
+                    </div>
+                    <div class="col-lg-10">
+                    <input type="email" class="form-control" name="email" placeholder="Email" required autofocus/>
+                    </div>
+                    <div class="col-lg-10"></div>
+                    <div class="col-lg-10">
+                        <input type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
+                    </div>
+                    <div class="col-lg-10"></div>
+                    <div class="col-lg-10"></div>
+                    <div class="col-lg-10">
+                        <button type="submit" class="btn btn-success col-lg-12">login</button>
+                    </div>
+                    <div class="col-lg-10"></div>
+                    <div class="col-lg-11 text-center text-info">{% if message %}
+                        <p style="color:red">&nbsp;&nbsp;{{message}}</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
         </form>
     </body>
 </html>

@@ -1,14 +1,16 @@
 CREATE TABLE users (
-	id		serial	PRIMARY KEY,
-	password		int,
+	id 			serial	PRIMARY KEY,
+	password	text,
+	email		text 	UNIQUE,
+	phone		text	UNIQUE,
 	name		text,
-	age		int,
+	gender		int,
 	followers	int	default 0,
 	followings	int	default 0
 );
 
 CREATE TABLE posts (
-	id		serial	PRIMARY KEY,
+	id			serial	PRIMARY KEY,
 	user_id		int	REFERENCES users,
 	repost_id	int	REFERENCES posts,
 	content		text not null,
@@ -16,10 +18,10 @@ CREATE TABLE posts (
 );
 
 CREATE TABLE comments (
-	id		serial	PRIMARY KEY,
+	id			serial	PRIMARY KEY,
 	user_id		int	REFERENCES users,
 	post_id		int	REFERENCES posts,
-	comment_id	int	REFERENCES comments	check(comment_id is null),
+	comment_id	int	REFERENCES comments,
 	content		text not null,
 	create_at	timestamp
 );
@@ -33,6 +35,7 @@ CREATE TABLE follows (
 CREATE TABLE favorates (
 	user_id		int	REFERENCES users,
 	post_id		int	REFERENCES posts,
+	create_at	timestamp,
 	UNIQUE(user_id,post_id)
 );
 
