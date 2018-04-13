@@ -6,64 +6,92 @@
     <meta charset="utf-8" />
     <title>User Login</title>
     <link rel="stylesheet" type="text/css" href="static/style.css">
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            position: fixed;
+            top: 0;
+            width: 100%;
+        }
+
+        li {
+            float:right;
+            background-color:#606060
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+    </style>
 </head>
 <body>
-    <form action="/register" method="post">
-        <div class="mycenter">
-        <div class="mysign">
-            <div class="col-lg-11 text-center text-info">
-                <h2>&nbsp;&nbsp;&nbsp;Please Register</h2>
-            </div>
 
-            <div class="col-lg-10">
-            <input type="text" class="form-control" name="email" placeholder="Email" required autofocus/>
-            </div>
-            <div class="col-lg-10"></div>
+<ul>
+    <li><a href="/login">Login</a></li>
+</ul>
 
-
-            <div class="col-lg-10">
-            <input type="text" class="form-control" name="name" placeholder="Usename" required autofocus/>
-            </div>
-            <div class="col-lg-10"></div>
-
-
-            <div class="col-lg-10">
-                <input type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
-            </div>
-            <div class="col-lg-10"></div>
-
-
-            <div class="col-lg-10">
-                <input type="password" class="form-control" name="password2" placeholder="Password Again" required autofocus/>
-            </div>
-            <div class="col-lg-10"></div>
-
-            <div class="col-lg-10"></div>
-            <div style="padding-left:45px;padding-top:3px;padding-bottom:3px" class="col-lg-10">
-                <div class="radio-inline">                    
-                   <input type="radio" name="gender" value="0" checked>Male
-                </div>
-                <label style="padding-left:55px" class="radio-inline">
-                    <input type="radio" name="gender" value="1">Female
-                </label>
-            </div>
-            <div class="col-lg-10"></div>
-
-
-            <div class="col-lg-10">
-                <button type="submit" class="btn btn-success col-lg-12">Register</button>
-            </div>
-            <div class="col-lg-10"></div>
-
-            <div class="col-lg-11 text-center text-info">{% if message %}
-                <p style="color:red">{{message}}</p>
-                    {% endif %}
-            </div>
-
+<form action="/register" method="post">
+    <div class="mycenter">
+    <div class="mysign">
+        <div class="col-lg-11 text-center text-info">
+            <h2>&nbsp;&nbsp;&nbsp;Please Register</h2>
         </div>
-        </div>
-    </form>
 
+        <div class="col-lg-10">
+        <input type="text" class="form-control" name="email" placeholder="Email" required autofocus/>
+        </div>
+        <div class="col-lg-10"></div>
+
+
+        <div class="col-lg-10">
+        <input type="text" class="form-control" name="name" placeholder="Usename" required autofocus/>
+        </div>
+        <div class="col-lg-10"></div>
+
+
+        <div class="col-lg-10">
+            <input type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
+        </div>
+        <div class="col-lg-10"></div>
+
+
+        <div class="col-lg-10">
+            <input type="password" class="form-control" name="password2" placeholder="Password Again" required autofocus/>
+        </div>
+        <div class="col-lg-10"></div>
+
+        <div class="col-lg-10"></div>
+        <div style="padding-left:45px;padding-top:3px;padding-bottom:3px" class="col-lg-10">
+            <div class="radio-inline">                    
+               <input type="radio" name="gender" value="0" checked>Male
+            </div>
+            <label style="padding-left:55px" class="radio-inline">
+                <input type="radio" name="gender" value="1">Female
+            </label>
+        </div>
+        <div class="col-lg-10"></div>
+
+
+        <div class="col-lg-10">
+            <button type="submit" class="btn btn-success col-lg-12">Register</button>
+        </div>
+        <div class="col-lg-10"></div>
+
+        <div class="col-lg-11 text-center text-info">{% if message %}
+            <p style="color:red">{{message}}</p>
+                {% endif %}
+        </div>
+
+    </div>
+    </div>
+</form>
 
 
 </body>

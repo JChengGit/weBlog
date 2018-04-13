@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+{% block body %}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>User Login</title>
+    <link rel="stylesheet" type="text/css" href="static/home.css">
+</head>
+<body>
+
+
+    <div>
+        <form action="/home" method="post">
+            <p for="name">Post</p>
+            <textarea class="form-control input-lg" name="content" placeholder="content" rows="4" ></textarea>
+             <button type="submit" class="btn btn-default">Post</button>
+        </form>
+    </div>
+
+
+    <div>
+        <p>Successfully Login!</p>
+    </div>
+
+
+</body>
+</html>

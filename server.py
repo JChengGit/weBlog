@@ -9,7 +9,7 @@ app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x
 
 @app.route('/')
 def index():
-	return redirect('register')
+	return redirect('/login')
 
 @app.route('/home',methods=['GET'])
 def home():
@@ -92,6 +92,18 @@ def register():
     conn.close()
     return redirect('/login')
 
+@app.route('/find')
+def find():
+    return render_template('find.html')
+
+@app.route('/favorates')
+def favorates():
+    return render_template('favorates.html')
+
+@app.route('/follow')
+def follow():
+    return render_template('follow.html') 
+
 @app.route('/logout',methods=['GET'])
 def logout():
     session.pop('current',None)
@@ -104,7 +116,7 @@ def validateEmail(addr):
             return 1
     return 0
 
-app.run(port=3000)
+app.run()
 
 
 
