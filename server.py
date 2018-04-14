@@ -2,6 +2,7 @@ import re,psycopg2
 from flask_bootstrap import Bootstrap
 from flask import Flask,request,render_template,redirect,make_response,session
 
+CONN = None
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -17,8 +18,7 @@ def home():
         return redirect('/login')
 
     current_id = session['current']
-    conn = psycopg2.connect(dbname="weibo", user="postgres",password="456", host="127.0.0.1", port="5432")
-    cur = conn.cursor()
+    cur = CONN.cursor()
     cur.execute("select content,create_at from posts where user_id=%s",(current_id,))
     posts = cur.fetchall()
     length = len(posts)
@@ -27,7 +27,6 @@ def home():
     for i in posts:
         cnt.append(i[0])
         tmstp.append(i[1])
-    print(cnt)
     return render_template('home.html',postlist=cnt,tmstp=tmstp)
 
 @app.route('/home',methods=['POST'])
@@ -35,13 +34,10 @@ def post():
     user_id = session['current']
     content = request.form['content']
 
-    conn = psycopg2.connect(dbname="weibo", user="postgres",
-    	password="456", host="127.0.0.1", port="5432")
-    cur = conn.cursor()
+    cur = CONN.cursor()
     data = (user_id,content)
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
-    conn.commit()
-    conn.close()
+    CONN.commit()
     return redirect('/home')
     
 @app.route('/login',methods=['GET'])
@@ -51,21 +47,19 @@ def logform():
 @app.route('/login',methods=['POST'])
 def login():
     email = request.form['email']
+    email = format_space(email)
     password = request.form['password']
     
-    conn = psycopg2.connect(dbname="weibo", user="postgres",
-    	password="456", host="127.0.0.1", port="5432")
-    cur = conn.cursor()
+    cur = CONN.cursor()
     cur.execute("SELECT password,id FROM users WHERE email=%s",(email,))
-    ps = cur.fetchall()
-    user_id = ps[0][1]
+    info = cur.fetchall()
 
-    if len(ps) == 0:
+    if len(info) == 0:
         return render_template('login.html',message=
             'User does not exist')
 
-    if ps[0][0] == password:
-        session['current'] = user_id
+    if info[0][0] == password:
+        session['current'] = info[0][1]
         return redirect('/home')
     return render_template('login.html',message=
         'Invalid email or password')
@@ -82,27 +76,22 @@ def register():
     password2 = request.form['password2']
     gender = int(request.form['gender'])
 
+    email = format_space(email)
+    name = format_space(name)
+
+    if name==0:
+        return render_template('register.html',message=
+            'Please type in an username.')
+
     if validateEmail(email)==0:
         return render_template('register.html',message=
     		'Please type in a valid Email.')
 
     if password2!= password:
         return render_template('register.html',message=
-            'Please type in same password')
+            'Please type in same passwords.')
 
-    conn = psycopg2.connect(dbname="weibo", user="postgres",
-    	password="456", host="127.0.0.1", port="5432")
-    cur = conn.cursor()
-    
-    cur.execute("select id from users where email=%s",(email,))
-    if len(cur.fetchall())!=0:
-        return render_template('register.html',message=
-            'This Email has been registered.')
-
-    data = (email,name,password,gender)
-    cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
-    conn.commit()
-    conn.close()
+    create_user(email,name,password, gender)
     return redirect('/login')
 
 @app.route('/find')
@@ -129,6 +118,38 @@ def validateEmail(addr):
             return 1
     return 0
 
+def create_user(email, name, password, gender):
+    cur = CONN.cursor()
+    cur.execute("select id from users where email=%s",(email,))
+    if len(cur.fetchall())!=0:
+        return render_template('register.html',message=
+            'This Email has been registered.')
+
+    data = (email,name,password,gender)
+    cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
+    CONN.commit()
+
+def format_space(st):
+    if re.match(r'^\s+$',st):
+        return(0)
+    args = re.split(r'\s+',st)
+    length = len(args)
+    if len(args[0])==0:
+        args.pop(0)
+        length=length-1
+    if len(args[length-1])==0:
+        args.pop(length-1)
+        length=length-1
+    format_st = args[0]
+    i=1
+    while i<length:
+        format_st = format_st+" "+args[i]
+        i = i+1
+    return format_st
+
+
+CONN = psycopg2.connect(dbname="weibo", user="postgres",
+        password="456", host="127.0.0.1", port="5432")
 app.run()
 
 
