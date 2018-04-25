@@ -3,17 +3,16 @@ from flask_bootstrap import Bootstrap
 from flask import Flask,request,render_template,redirect,make_response,session
 
 CONN = None
-
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x81'
 
 @app.route('/')
 def index():
-	return redirect('/login')
+    return redirect('/login')
 
 @app.route('/home',methods=['GET'])
-def home():
+def home(): 
     if 'current' not in session:
         return redirect('/login')
 
@@ -47,7 +46,7 @@ def logform():
 @app.route('/login',methods=['POST'])
 def login():
     email = request.form['email']
-    email = format_space(email)
+    email = format_str(email)
     password = request.form['password']
     
     cur = CONN.cursor()
@@ -76,23 +75,56 @@ def register():
     password2 = request.form['password2']
     gender = int(request.form['gender'])
 
-    email = format_space(email)
-    name = format_space(name)
+    email = format_str(email)
+    name = format_str(name)
 
-    if name==0:
-        return render_template('register.html',message=
-            'Please type in an username.')
-
-    if validateEmail(email)==0:
-        return render_template('register.html',message=
-    		'Please type in a valid Email.')
-
+    if validate_email(email)==0:
+        return render_template('register.html',message='Please type in a valid Email.')
     if password2!= password:
-        return render_template('register.html',message=
-            'Please type in same passwords.')
+        return render_template('register.html',message='Please type in same passwords.')
 
-    create_user(email,name,password, gender)
-    return redirect('/login')
+    result = create_user(email,name,password,gender)
+    if result == "users_name_key":
+        return render_template('register.html',message="Username has already existed.")
+    elif result == "users_email_key":
+        return render_template('register.html',message="Email has already been registered.")
+    else:
+        return redirect('/login')
+
+
+
+@app.route('/setting',methods = ['GET'])
+def setting():
+    return render_template('setting.html')
+@app.route('/setting',methods = ['POST'])
+def reset():
+    current_id = session['current']
+    cur = CONN.cursor()
+    try:
+        usn = format_str(request.form['username'])
+        if usn == 0:
+            return render_template('setting.html',usn="Please type in an username.")
+        username = "'"+usn+"'"
+        try:
+            cur.execute("UPDATE users SET name={} WHERE id={}".format(username,current_id))
+        except psycopg2.IntegrityError as e:
+            err = e.args[0].split('"')[1]
+            if  err == "users_name_key":
+                CONN.commit()
+                return render_template('setting.html',usn="Username has already existed.")
+            return 'Unknown Error.'
+        CONN.commit()
+        return render_template('setting.html',usn="You have changed your username into {}.".format(usn))
+    except:
+        password = request.form['password']
+        password2 = request.form['password2']
+        if password2 != password:
+            return render_template('/setting',pwd="Please type in same passwords.")
+        cur.execute("UPDATE users SET password={} WHERE id={}".format(password,current_id))
+        CONN.commit()
+        return render_template('setting.html',pwd="You have changed your password.")
+
+
 
 @app.route('/find')
 def find():
@@ -111,7 +143,9 @@ def logout():
     session.pop('current',None)
     return redirect('/login')
 
-def validateEmail(addr):
+
+
+def validate_email(addr):
     if len(addr) > 7:
         if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\."
                     "([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$",addr) != None:
@@ -120,37 +154,27 @@ def validateEmail(addr):
 
 def create_user(email, name, password, gender):
     cur = CONN.cursor()
-    cur.execute("select id from users where email=%s",(email,))
-    if len(cur.fetchall())!=0:
-        return render_template('register.html',message=
-            'This Email has been registered.')
-
     data = (email,name,password,gender)
-    cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
-    CONN.commit()
+    try:
+        cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
+        CONN.commit()
+    except  psycopg2.IntegrityError as e:
+        err = e.args[0].split('"')[1]
+        CONN.commit()
+        return err
 
-def format_space(st):
+
+def format_str(st):
     if re.match(r'^\s+$',st):
-        return(0)
-    args = re.split(r'\s+',st)
-    length = len(args)
-    if len(args[0])==0:
-        args.pop(0)
-        length=length-1
-    if len(args[length-1])==0:
-        args.pop(length-1)
-        length=length-1
-    format_st = args[0]
-    i=1
-    while i<length:
-        format_st = format_st+" "+args[i]
-        i = i+1
+        return 0
+    format_st = re.sub(r'\s+',r' ',st.strip()).lower()
     return format_st
 
 
 CONN = psycopg2.connect(dbname="weibo", user="postgres",
         password="456", host="127.0.0.1", port="5432")
-app.run()
 
 
+if __name__ == '__main__':
+    app.run()
 

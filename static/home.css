@@ -36,11 +36,3 @@ li a:hover:not(.active) {
     background-color: #4CAF50;
 }
 
-p {
-    color:blue;
-    text-align:justify;
-    text-indent:45px;
-    font-style:normal;
-    font-size:40px;
-}
-

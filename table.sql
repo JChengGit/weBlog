@@ -3,7 +3,7 @@ CREATE TABLE users (
 	password	text,
 	email		text 	UNIQUE,
 	phone		text	UNIQUE,
-	name		text,
+	name		text	UNIQUE,
 	gender		int,
 	followers	int	default 0,
 	followings	int	default 0
@@ -50,7 +50,4 @@ CREATE TABLE likecmts (
 	comment_id	int	REFERENCES comments,
 	UNIQUE(user_id,comment_id)
 );
-
-
-
 
