@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+{% block body %}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>User Login</title>
+    <link rel="stylesheet" type="text/css" href="static/home.css">
+</head>
+<body>
+
+<ul>
+    <li style="margin-left:160px"><a href="/home">Home</a></li>
+    <li><a href="/find">Find</a></li>
+    <li><a href="/favorates">Favorates</a></li>
+    <li><a href="/follow">Follow</a></li>
+    <li><a class="active" href="/setting">Setting</a></li>
+    <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
+</ul>
+
+<div style="margin-left:200px;margin-top:100px;">
+    <h1 style="padding-bottom: 50px">Setting.</h1>
+	<form action="/setting" method="post">
+	    <div>
+	        <h4>Change your username:</h5>
+	        <input type="text" name="username" placeholder="New name" required="required"/>
+	        <button type="submit" >Reset</button>
+	    </div>
+	    <div>{% if usn %}
+	        <p style="color:red">&nbsp;&nbsp;{{usn}}</p>
+	        {% endif %}
+	    </div>
+	</form><br>
+
+	<form action="/setting" method="post">
+	    <div>
+	        <h4>Change your password:</h5>
+	        <input type="password" name="password" placeholder="New password" required="required"/><br>
+	        <input type="password" name="password2" placeholder="New password again" required="required"/>
+	        <button type="submit">Reset</button> 
+	    </div>
+	    <div>{% if pwd %}
+	        <p style="color:red">&nbsp;&nbsp;{{pwd}}</p>
+	        {% endif %}
+	    </div>
+	</form>
+
+
+</div>  
+
+</body>
+</html>
+{% endblock %}
