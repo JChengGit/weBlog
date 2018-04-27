@@ -27,10 +27,12 @@
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
 
-<div style="padding:20px;margin-top:30px;height:1500px;">
-	<h1 style="margin-left:160px">Successfully Login!</h1>
-
-    <div style="margin-top: 50px;margin-bottom: 50px;margin-right: 460px;margin-left: 160px">
+<div style="padding:20px;margin-left:160px;margin-top:30px;height:1500px;">
+    <div>
+    	<h1>Welcome, {{username}}.</h1>
+        <p style="margin-top:40px">You have {{post_number}} posts.</p>
+    </div>
+    <div style="margin-top: 50px;margin-bottom: 50px;margin-right: 460px;">
         <form action="/home" method="post">
             <textarea class="form-control input-lg" name="content" placeholder="Type in your content" rows="4" ></textarea>
              <button style="float: right" type="submit" class="btn btn-default">Post</button>
@@ -38,28 +40,14 @@
     </div>
 
 
-    <div style="margin: 50px 160px">
+    <div style="margin-right: 160px">
+        {% if posts %}
+        {% for i in posts %}
+        <p style="margin-top: 50px">{{i[0]}}</p>
+        <p style="float: right;font-size:15px;padding-right: 300px">{{i[1]}}</p>
+        {% endfor %}
+        {% endif %}
 
-        <p>{{postlist[0]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[0]}}</p><br><br>
-        <p>{{postlist[1]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[1]}}</p><br><br>
-        <p>{{postlist[2]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[2]}}</p><br><br>
-        <p>{{postlist[3]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[3]}}</p><br><br>
-        <p>{{postlist[4]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[4]}}</p><br><br>
-        <p>{{postlist[5]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[5]}}</p><br><br>
-        <p>{{postlist[6]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[6]}}</p><br><br>
-        <p>{{postlist[7]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[7]}}</p><br><br>
-        <p>{{postlist[8]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[8]}}</p><br><br>
-        <p>{{postlist[9]}}</p><br>
-        <p style="float: right;color: black;font-size:15px;padding-right: 300px">{{tmstp[9]}}</p><br><br>
     </div>
 
 </div> 

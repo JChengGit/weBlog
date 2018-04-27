@@ -20,17 +20,6 @@
 
 <div style="margin-left:200px;margin-top:100px;">
     <h1 style="padding-bottom: 50px">Setting.</h1>
-	<form action="/setting" method="post">
-	    <div>
-	        <h4>Change your username:</h5>
-	        <input type="text" name="username" placeholder="New name" required="required"/>
-	        <button type="submit" >Reset</button>
-	    </div>
-	    <div>{% if usn %}
-	        <p style="color:red">&nbsp;&nbsp;{{usn}}</p>
-	        {% endif %}
-	    </div>
-	</form><br>
 
 	<form action="/setting" method="post">
 	    <div>

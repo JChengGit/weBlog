@@ -1,4 +1,4 @@
-import re,psycopg2
+import re,psycopg2,hashlib
 from flask_bootstrap import Bootstrap
 from flask import Flask,request,render_template,redirect,make_response,session
 
@@ -18,20 +18,20 @@ def home():
 
     current_id = session['current']
     cur = CONN.cursor()
-    cur.execute("select content,create_at from posts where user_id=%s",(current_id,))
+    cur.execute("SELECT name,posts FROM users WHERE id=%s",(current_id,))
+    userinfo = cur.fetchall()[0]
+    username = userinfo[0]
+    post_number = userinfo[1]
+    cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
     posts = cur.fetchall()
-    length = len(posts)
-    cnt = []
-    tmstp = []
-    for i in posts:
-        cnt.append(i[0])
-        tmstp.append(i[1])
-    return render_template('home.html',postlist=cnt,tmstp=tmstp)
+    posts.reverse()
+    return render_template('home.html',username=username,post_number=post_number,
+        posts=posts)
 
 @app.route('/home',methods=['POST'])
 def post():
     user_id = session['current']
-    content = request.form['content']
+    content = format_space(request.form['content'])
 
     cur = CONN.cursor()
     data = (user_id,content)
@@ -45,19 +45,19 @@ def logform():
     
 @app.route('/login',methods=['POST'])
 def login():
-    email = request.form['email']
-    email = format_str(email)
-    password = request.form['password']
-    
     cur = CONN.cursor()
-    cur.execute("SELECT password,id FROM users WHERE email=%s",(email,))
+    password = request.form['password']
+    name = format_space(request.form['name'])
+    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    if validate_email(name)==1:
+        cur.execute("SELECT password,id FROM users WHERE email=%s",(name,))
+    else:
+        cur.execute("SELECT password,id FROM users WHERE name=%s",(name,))
     info = cur.fetchall()
 
     if len(info) == 0:
-        return render_template('login.html',message=
-            'User does not exist')
-
-    if info[0][0] == password:
+        return render_template('login.html',message='User does not exist')
+    if info[0][0] == password_hash:
         session['current'] = info[0][1]
         return redirect('/home')
     return render_template('login.html',message=
@@ -74,12 +74,15 @@ def register():
     password = request.form['password']
     password2 = request.form['password2']
     gender = int(request.form['gender'])
-
-    email = format_str(email)
-    name = format_str(name)
+    email = format_space(email).lower()
+    name = format_space(name)
 
     if validate_email(email)==0:
         return render_template('register.html',message='Please type in a valid Email.')
+    if name == 0:
+        return render_template('register.html',message='Please type in a Username.')
+    if len(password)<6:
+        return render_template('register.html',message='Password has to be at least 6 characters.')
     if password2!= password:
         return render_template('register.html',message='Please type in same passwords.')
 
@@ -100,29 +103,13 @@ def setting():
 def reset():
     current_id = session['current']
     cur = CONN.cursor()
-    try:
-        usn = format_str(request.form['username'])
-        if usn == 0:
-            return render_template('setting.html',usn="Please type in an username.")
-        username = "'"+usn+"'"
-        try:
-            cur.execute("UPDATE users SET name={} WHERE id={}".format(username,current_id))
-        except psycopg2.IntegrityError as e:
-            err = e.args[0].split('"')[1]
-            if  err == "users_name_key":
-                CONN.commit()
-                return render_template('setting.html',usn="Username has already existed.")
-            return 'Unknown Error.'
-        CONN.commit()
-        return render_template('setting.html',usn="You have changed your username into {}.".format(usn))
-    except:
-        password = request.form['password']
-        password2 = request.form['password2']
-        if password2 != password:
-            return render_template('/setting',pwd="Please type in same passwords.")
-        cur.execute("UPDATE users SET password={} WHERE id={}".format(password,current_id))
-        CONN.commit()
-        return render_template('setting.html',pwd="You have changed your password.")
+    password = request.form['password']
+    password2 = request.form['password2']
+    if password2 != password:
+        return render_template('/setting',pwd="Please type in same passwords.")
+    cur.execute("UPDATE users SET password={} WHERE id={}".format(password,current_id))
+    CONN.commit()
+    return render_template('setting.html',pwd="You have changed your password.")
 
 
 
@@ -154,7 +141,8 @@ def validate_email(addr):
 
 def create_user(email, name, password, gender):
     cur = CONN.cursor()
-    data = (email,name,password,gender)
+    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    data = (email,name,password_hash,gender)
     try:
         cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
         CONN.commit()
@@ -164,17 +152,15 @@ def create_user(email, name, password, gender):
         return err
 
 
-def format_str(st):
+def format_space(st):
     if re.match(r'^\s+$',st):
         return 0
-    format_st = re.sub(r'\s+',r' ',st.strip()).lower()
+    format_st = re.sub(r'\s+',r' ',st.strip())
     return format_st
 
 
-CONN = psycopg2.connect(dbname="weibo", user="postgres",
-        password="456", host="127.0.0.1", port="5432")
-
-
 if __name__ == '__main__':
+    CONN = psycopg2.connect(dbname="weibo", user="postgres",
+        password="456", host="127.0.0.1", port="5432")
     app.run()
 
