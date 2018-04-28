@@ -10,7 +10,7 @@ app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x
 @app.route('/')
 def index():
     return redirect('/login')
-    
+
 
 @app.route('/home',methods=['GET'])
 def home(): 
@@ -67,25 +67,25 @@ def register():
     password = request.form['password']
     password2 = request.form['password2']
     gender = int(request.form['gender'])
-    email = format_space(email).lower()
-    name = format_space(name)
 
-    if validate_email(email)==0:
+    result = create_user(email,name,password,password2,gender)
+
+
+    if result == 'invalidEmail':
         return render_template('register.html',message='Please type in a valid Email.')
-    if name == 0:
+    if result == 'noName':
         return render_template('register.html',message='Please type in a Username.')
-    if len(password)<6:
+    if result == 'short':
         return render_template('register.html',message='Password has to be at least 6 characters.')
-    if password2!= password:
+    if result == 'wrongPWD':
         return render_template('register.html',message='Please type in same passwords.')
-
-    result = create_user(email,name,password,gender)
     if result == "users_name_key":
         return render_template('register.html',message="Username has already existed.")
-    elif result == "users_email_key":
+    if result == "users_email_key":
         return render_template('register.html',message="Email has already been registered.")
     else:
         return redirect('/login')
+
 
 
 
@@ -132,9 +132,20 @@ def validate_email(addr):
             return 1
     return 0
 
-def create_user(email, name, password, gender):
-    cur = CONN.cursor()
+
+def create_user(email, name, password, password2, gender):
+    email = format_space(email).lower()
+    name = format_space(name)
+    if password != password2:
+        return 'wrongPWD'
+    if validate_email(email)==0:
+        return 'invalidEmail'
+    if len(password)<6:
+        return 'short'
+    if name==0:
+        return 'noName'
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    cur = CONN.cursor()
     data = (email,name,password_hash,gender)
     try:
         cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
