@@ -10,6 +10,7 @@ app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x
 @app.route('/')
 def index():
     return redirect('/login')
+    
 
 @app.route('/home',methods=['GET'])
 def home(): 
@@ -27,46 +28,38 @@ def home():
     posts.reverse()
     return render_template('home.html',username=username,post_number=post_number,
         posts=posts)
-
 @app.route('/home',methods=['POST'])
 def post():
     user_id = session['current']
     content = format_space(request.form['content'])
-
     cur = CONN.cursor()
     data = (user_id,content)
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
     CONN.commit()
     return redirect('/home')
     
+
 @app.route('/login',methods=['GET'])
 def logform():
     return render_template('login.html')
-    
 @app.route('/login',methods=['POST'])
 def login():
-    cur = CONN.cursor()
     password = request.form['password']
-    name = format_space(request.form['name'])
-    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
-    if validate_email(name)==1:
-        cur.execute("SELECT password,id FROM users WHERE email=%s",(name,))
-    else:
-        cur.execute("SELECT password,id FROM users WHERE name=%s",(name,))
-    info = cur.fetchall()
+    name = request.form['name']
 
-    if len(info) == 0:
+    result = user_login(name,password)
+    if result == 0:
         return render_template('login.html',message='User does not exist')
-    if info[0][0] == password_hash:
-        session['current'] = info[0][1]
+    elif result == 1:
+        return render_template('login.html',message='Invalid email or password')
+    else:
+        session['current'] = result
         return redirect('/home')
-    return render_template('login.html',message=
-        'Invalid email or password')
-    
+
+
 @app.route('/register',methods=['GET'])
 def regiform():
     return render_template('register.html')
-
 @app.route('/register',methods=['POST'])
 def register():
     email = request.form['email']
@@ -151,6 +144,22 @@ def create_user(email, name, password, gender):
         CONN.commit()
         return err
 
+def user_login(name,password):
+    cur = CONN.cursor()
+    name_f = format_space(name)
+    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    if validate_email(name_f)==1:
+        cur.execute("SELECT password,id FROM users WHERE email=%s",(name_f,))
+    else:
+        cur.execute("SELECT password,id FROM users WHERE name=%s",(name_f,))
+    info = cur.fetchall()
+
+    if len(info) == 0:
+        return "noName"
+    elif info[0][0] != password_hash:
+        return "wrongPWD"
+    else:
+        return info[0][1]
 
 def format_space(st):
     if re.match(r'^\s+$',st):
@@ -159,7 +168,7 @@ def format_space(st):
     return format_st
 
 
-CONN = psycopg2.connect(dbname="weibo", user="postgres",
+CONN = psycopg2.connect(dbname="testDB", user="postgres",
     password="456", host="127.0.0.1", port="5432")
 if __name__ == '__main__':
     app.run()
