@@ -65,6 +65,22 @@ CREATE FUNCTION post_count() RETURNS TRIGGER AS $post_table$
 $post_table$ LANGUAGE plpgsql;
 
 CREATE TRIGGER posts_counter AFTER INSERT OR DELETE ON posts
-FOR EACH ROW EXECUTE PROCEDURE post_count()
+FOR EACH ROW EXECUTE PROCEDURE post_count();
 
 
+CREATE FUNCTION follows_couter() RETURNS TRIGGER AS $follows_table$
+	BEGIN
+		IF (TG_OP = 'INSERT') THEN
+			UPDATE users SET followers=followers+1 WHERE id=new.user_id;
+			UPDATE users SET followering=followering+1 WHERE id=new.fan_id;
+			RETURN NEW;
+		ELSIF (TG_OP = 'DELETE') THEN
+			UPDATE users SET followers=followers-1 WHERE id=new.user_id;
+			UPDATE users SET followering=followering-1 WHERE id=new.fan_id;
+			RETURN NEW;
+		END IF;
+	END;
+$follows_table$ LANGUAGE plpgsql;
+
+CREATE TRIGGER follows_couter AFTER INSERT OR DELETE ON follows
+FOR EACH ROW EXECUTE PROCEDURE follows_couter();

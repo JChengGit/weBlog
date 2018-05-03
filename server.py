@@ -39,7 +39,7 @@ def post():
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
     CONN.commit()
     return redirect('/home')
-    
+
 
 @app.route('/login',methods=['GET'])
 def logform():
@@ -137,9 +137,9 @@ def create_user(email, name, password, password2, gender):
         cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
         CONN.commit()
     except  psycopg2.IntegrityError as e:
-        err = e.args[0].split('"')[1]
+        result = e.args[0].split('"')[1]
         CONN.commit()
-        return err
+        return result
 
 def user_login(name,password):
     cur = CONN.cursor()
@@ -150,7 +150,6 @@ def user_login(name,password):
     else:
         cur.execute("SELECT password,id FROM users WHERE name=%s",(name_f,))
     info = cur.fetchall()
-
     if len(info) == 0:
         return "noName"
     elif info[0][0] != password_hash:
