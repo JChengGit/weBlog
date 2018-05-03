@@ -54,12 +54,17 @@ CREATE TABLE likecmts (
 
 CREATE FUNCTION post_count() RETURNS TRIGGER AS $post_table$
 	BEGIN
-		UPDATE users SET posts=posts+1 WHERE id=new.user_id;
-		RETURN NEW;
+		IF (TG_OP = 'INSERT') THEN
+			UPDATE users SET posts=posts+1 WHERE id=new.user_id;
+			RETURN NEW;
+		ELSIF (TG_OP = 'DELETE') THEN
+			UPDATE users SET posts=posts-1 WHERE id=new.user_id;
+			RETURN NEW;
+		END IF;
 	END;
 $post_table$ LANGUAGE plpgsql;
 
-CREATE TRIGGER posts_counter AFTER INSERT ON posts
+CREATE TRIGGER posts_counter AFTER INSERT OR DELETE ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_count()
 
 

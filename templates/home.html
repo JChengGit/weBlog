@@ -37,6 +37,9 @@
             <textarea class="form-control input-lg" name="content" placeholder="Type in your content" rows="4" ></textarea>
              <button style="float: right" type="submit" class="btn btn-default">Post</button>
         </form>
+        {% if message %}
+        <p style="color: red; font-size: 15px">&nbsp;{{message}}</p>
+        {% endif %}
     </div>
 
 

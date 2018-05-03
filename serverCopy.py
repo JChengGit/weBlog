@@ -32,6 +32,8 @@ def home():
 def post():
     user_id = session['current']
     content = format_space(request.form['content'])
+    if content == 0:
+        return render_template("home.html",message="Please type in post content.")
     cur = CONN.cursor()
     data = (user_id,content)
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
@@ -46,11 +48,10 @@ def logform():
 def login():
     password = request.form['password']
     name = request.form['name']
-
     result = user_login(name,password)
-    if result == 0:
+    if result == "noName":
         return render_template('login.html',message='User does not exist')
-    elif result == 1:
+    if result == "wrongPWD":
         return render_template('login.html',message='Invalid email or password')
     else:
         session['current'] = result
@@ -69,8 +70,6 @@ def register():
     gender = int(request.form['gender'])
 
     result = create_user(email,name,password,password2,gender)
-
-
     if result == 'invalidEmail':
         return render_template('register.html',message='Please type in a valid Email.')
     if result == 'noName':
@@ -87,8 +86,6 @@ def register():
         return redirect('/login')
 
 
-
-
 @app.route('/setting',methods = ['GET'])
 def setting():
     return render_template('setting.html')
@@ -98,39 +95,28 @@ def reset():
     cur = CONN.cursor()
     password = request.form['password']
     password2 = request.form['password2']
+    if password < 6:
+        return render_template('setting.html',pwd="Password has to be at least 6 characters.")
     if password2 != password:
-        return render_template('/setting',pwd="Please type in same passwords.")
+        return render_template('setting.html',pwd="Please type in same passwords.")
     cur.execute("UPDATE users SET password={} WHERE id={}".format(password,current_id))
     CONN.commit()
     return render_template('setting.html',pwd="You have changed your password.")
 
 
-
 @app.route('/find')
 def find():
     return render_template('find.html')
-
 @app.route('/favorates')
 def favorates():
     return render_template('favorates.html')
-
 @app.route('/follow')
 def follow():
     return render_template('follow.html') 
-
 @app.route('/logout',methods=['GET'])
 def logout():
     session.pop('current',None)
     return redirect('/login')
-
-
-
-def validate_email(addr):
-    if len(addr) > 7:
-        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\."
-                    "([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$",addr) != None:
-            return 1
-    return 0
 
 
 def create_user(email, name, password, password2, gender):
@@ -178,9 +164,15 @@ def format_space(st):
     format_st = re.sub(r'\s+',r' ',st.strip())
     return format_st
 
+def validate_email(addr):
+    if len(addr) > 7:
+        if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\."
+                    "([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$",addr) != None:
+            return 1
+    return 0
+
 
 CONN = psycopg2.connect(dbname="testDB", user="postgres",
     password="456", host="127.0.0.1", port="5432")
 if __name__ == '__main__':
     app.run()
-
