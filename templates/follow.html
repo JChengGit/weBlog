@@ -10,36 +10,47 @@
 <ul>
     <li style="margin-left:160px"><a href="/home">Home</a></li>
     <li><a href="/find">Find</a></li>
-    <li><a href="/favorates">Favorates</a></li>
     <li><a class="active" href="/follow">Follow</a></li>
+    <li><a href="/favorates">Favorates</a></li>
     <li><a href="/setting">Setting</a></li>
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
 
-<div style="padding:20px;margin-top:30px;height:1500px;">
-<h1 style="margin-left:160px">Check your following and followed users.</h1>
+<div style="padding:20px;margin-top:30px;margin-left:160px">
+<h1 style="margin-bottom: 40px;">Check your following and followed users.</h1>
 
-<br><br><br>
-
-
-
-<div style="border-color: black; width: 500px; float: left; padding: 30px; margin: 30px">
-	
-
+<div style="width: 600px; float: left; margin-right: : 30px;">
+<h2>You are following {{count[0]}} users:</h2>
+<table>
+{% for i in followings %}
+<tr>
+    <form action="/follow" method="post">
+        <td>
+            <input type="hidden" name="user_id" value="{{i[0]}}">
+            <label style="font-size:24px;">{{i[1]}}</label>
+        </td>
+        <td>
+            <button type="submit" style="width:90px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:16px;padding:10px;">Unfollow</button>
+        </td>
+    </form>
+</tr>
+{% endfor %}
+</table>
 </div>
 
-
-
-
-<div style="border-color: black; width: 500px; float: left; padding: 30px; margin: 30px">
-	
-
+<div style="width: 600px; float: left;">
+<h2>Your have {{count[1]}} followers:</h2>
+<table>
+<tr>
+    <td>
+        {% for i in followers %}
+        <p style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</p>
+    </td>
+</tr>
+{% endfor %}
+</table>
 </div>
-
-
-
 
 </div>  
-
 </body>
 </html>

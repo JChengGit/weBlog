@@ -36,3 +36,12 @@ li a:hover:not(.active) {
     background-color: #4CAF50;
 }
 
+table,td,th {
+    border: none;
+}
+
+td {
+    text-align: left;
+    width: 180px;
+    height: 60px;
+}

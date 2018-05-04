@@ -10,8 +10,8 @@
 <ul>
     <li style="margin-left:160px"><a href="/home">Home</a></li>
     <li><a href="/find">Find</a></li>
-    <li><a href="/favorates">Favorates</a></li>
     <li><a href="/follow">Follow</a></li>
+    <li><a href="/favorates">Favorates</a></li>
     <li><a class="active" href="/setting">Setting</a></li>
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
@@ -21,10 +21,10 @@
 
 	<form action="/setting" method="post">
 	    <div>
-	        <h4>Change your password:</h5>
-	        <input type="password" name="password" placeholder="New password" required="required"/><br>
-	        <input type="password" name="password2" placeholder="New password again" required="required"/>
-	        <button type="submit">Reset</button> 
+	        <h3>Change your password:</h3>
+	        <input style="height: 28px; margin-bottom: 1px;"  type="password" name="password" placeholder="New password" required="required"/><br>
+	        <input style="height: 28px; margin-bottom: 1px;"  type="password" name="password2" placeholder="New password again" required="required"/>
+	        <button type="submit" style="width:90px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:16px;padding:10px;">Reset</button> 
 	    </div>
 	    <div>{% if pwd %}
 	        <p style="color:red">&nbsp;&nbsp;{{pwd}}</p>

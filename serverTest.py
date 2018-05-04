@@ -30,7 +30,7 @@ class TestServer(unittest.TestCase):
         self.assertEqual(create_user("123@qwe.com","Foo Bar","123123","123123","0"),None)
         self.assertEqual(create_user("invalidEmail","Foo Bar","123123","123123","0"),"invalidEmail")
         self.assertEqual(create_user("123@qwe.com","         ","123123","123123","0"),"noName")
-        self.assertEqual(create_user("123@qwe.com","Foo Bar","123","123","0"),"short")
+        self.assertEqual(create_user("000@qwe.com","XXX Bar","123","123","0"),"short")
         self.assertEqual(create_user("123@qwe.com","Foo Bar","123123","999999","0"),"wrongPWD")
         self.assertEqual(create_user("123@qwe.com","XXX","999999","999999","0"),"users_email_key")
         self.assertEqual(create_user("456@qwe.com","Foo Bar","123123","123123","0"),"users_name_key")

@@ -58,7 +58,7 @@ CREATE FUNCTION post_count() RETURNS TRIGGER AS $post_table$
 			UPDATE users SET posts=posts+1 WHERE id=new.user_id;
 			RETURN NEW;
 		ELSIF (TG_OP = 'DELETE') THEN
-			UPDATE users SET posts=posts-1 WHERE id=new.user_id;
+			UPDATE users SET posts=posts-1 WHERE id=old.user_id;
 			RETURN NEW;
 		END IF;
 	END;
@@ -72,11 +72,11 @@ CREATE FUNCTION follows_couter() RETURNS TRIGGER AS $follows_table$
 	BEGIN
 		IF (TG_OP = 'INSERT') THEN
 			UPDATE users SET followers=followers+1 WHERE id=new.user_id;
-			UPDATE users SET followering=followering+1 WHERE id=new.fan_id;
+			UPDATE users SET followings=followings+1 WHERE id=new.fan_id;
 			RETURN NEW;
 		ELSIF (TG_OP = 'DELETE') THEN
-			UPDATE users SET followers=followers-1 WHERE id=new.user_id;
-			UPDATE users SET followering=followering-1 WHERE id=new.fan_id;
+			UPDATE users SET followers=followers-1 WHERE id=old.user_id;
+			UPDATE users SET followings=followings-1 WHERE id=old.fan_id;
 			RETURN NEW;
 		END IF;
 	END;

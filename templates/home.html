@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>User Login</title>
+    <title>Home</title>
     <link rel="stylesheet" type="text/css" href="static/home.css">
     <style type="text/css">
     	p {
@@ -19,21 +19,21 @@
 <ul>
     <li style="margin-left:160px"><a class="active" href="/home">Home</a></li>
     <li><a href="/find">Find</a></li>
-    <li><a href="/favorates">Favorates</a></li>
     <li><a href="/follow">Follow</a></li>
+    <li><a href="/favorates">Favorates</a></li>
     <li><a href="/setting">Setting</a></li>
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
 
-<div style="padding:20px;margin-left:160px;margin-top:30px;height:1500px;">
+<div style="padding:20px;margin-left:160px;margin-top:30px;">
     <div>
     	<h1>Welcome, {{username}}.</h1>
         <p style="margin-top:40px">You have {{post_number}} posts.</p>
     </div>
     <div style="margin-top: 50px;margin-bottom: 50px;margin-right: 460px;">
         <form action="/home" method="post">
-            <textarea class="form-control input-lg" name="content" placeholder="Type in your content" rows="4" ></textarea>
-             <button style="float: right" type="submit" class="btn btn-default">Post</button>
+            <textarea style="width: 1180px;" name="content" placeholder="Type in your content" rows="4" ></textarea><br><br>
+             <button style="float: right" type="submit">Post</button>
         </form>
         {% if message %}
         <p style="color: red; font-size: 15px">&nbsp;{{message}}</p>
