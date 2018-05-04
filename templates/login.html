@@ -1,69 +1,38 @@
 <!DOCTYPE html>
-{% extends "bootstrap/base.html" %}
-{% block body %}
 <html>
 <head>
     <meta charset="utf-8" />
     <title>User Login</title>
-    <link rel="stylesheet" type="text/css" href="static/style.css">
-    <style type="text/css">
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #333;
-            position: fixed;
-            top: 0;
-            width: 100%;
-        }
-
-        li {
-            float:right;
-            background-color:#606060
-        }
-
-        li a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-    </style>
+    <link rel="stylesheet" type="text/css" href="static/home.css">
 </head>
 <body>
 
 <ul>
-    <li><a href="/register">Register</a></li>
+    <li style="float:right;background-color:#606060"><a href="/register">Register</a></li>
 </ul>
 
+<div>
 <form action="/login" method="post">
-    <div class="mycenter">
-        <div class="mysign">
-            <div class="col-lg-11 text-center text-info">
-                <h2>Please login</h2>
-            </div>
-            <div class="col-lg-10">
-            <input type="text" class="form-control" name="name" placeholder="Email or Username" required autofocus/>
-            </div>
-            <div class="col-lg-10"></div>
-            <div class="col-lg-10">
-                <input type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
-            </div>
-            <div class="col-lg-10"></div>
-            <div class="col-lg-10"></div>
-            <div class="col-lg-10">
-                <button type="submit" class="btn btn-success col-lg-12">login</button>
-            </div>
-            <div class="col-lg-10"></div>
-            <div class="col-lg-11 text-center text-info">{% if message %}
-                <p style="color:red">&nbsp;&nbsp;{{message}}</p>
-                {% endif %}
-            </div>
+    <div style="margin-top:260px;width:270px;margin-left:auto;margin-right:auto">
+        <div>
+            <h2 style="margin-left: 40px;margin-bottom: 8px;">Please login</h2>
+        </div>
+        <div>
+            <input style="height: 28px; margin-bottom: 1px;" type="text" class="form-control" name="name" placeholder="Email or Username" required autofocus/>
+        </div>
+        <div>
+            <input style="height: 28px; margin-bottom: 1px;" type="password" class="form-control" name="password" placeholder="Password" required autofocus/>
+        </div>
+        <div>
+            <button style="width:242px;margin:2px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:18px;padding-top:7px;padding-bottom:7px;" type="submit">login</button>
+        </div>
+        <div text-center text-info">{% if message %}
+            <p style="color:red">&nbsp;&nbsp;{{message}}</p>
+            {% endif %}
         </div>
     </div>
 </form>
+</div>
 
 </body>
 </html>
-{% endblock %}

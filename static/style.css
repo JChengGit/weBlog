@@ -2,6 +2,7 @@ body {
     margin:0;
     background:url(imgs/bg.jpg) #f8f6e9;
     background-repeat:no-repeat;
+    background-attachment:fixed;
 }
 
 .mycenter{
@@ -28,4 +29,6 @@ body {
     margin-bottom: 10px;
     height: 10px;
 }
+
+
 

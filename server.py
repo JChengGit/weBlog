@@ -99,14 +99,28 @@ def reset():
         return render_template('setting.html',pwd="Password has to be at least 6 characters.")
     if password2 != password:
         return render_template('setting.html',pwd="Please type in same passwords.")
-    cur.execute("UPDATE users SET password={} WHERE id={}".format(password,current_id))
+    cur.execute("UPDATE users SET password=%s WHERE id=%s",(password,int(current_id)))
     CONN.commit()
     return render_template('setting.html',pwd="You have changed your password.")
 
 
-@app.route('/find')
+@app.route('/find',methods=['GET'])
 def find():
-    return render_template('find.html')
+    current_id = session['current']
+    cur = CONN.cursor()
+    cur.execute("SELECT name FROM users WHERE id!=%s",(int(current_id),))
+    data = cur.fetchall()
+    users = []
+    for i in data:
+        users.append(data[0])
+    return render_template('find.html',users=users)
+
+@app.route('/find',methods=['POST'])
+def found():
+    follow_id = request.form['follow_id']
+
+
+
 @app.route('/favorates')
 def favorates():
     return render_template('favorates.html')
