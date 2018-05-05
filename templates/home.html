@@ -33,11 +33,11 @@
     <div style="margin-top: 50px;margin-bottom: 50px;margin-right: 460px;">
         <form action="/home" method="post">
             <textarea style="width: 1180px;" name="content" placeholder="Type in your content" rows="4" ></textarea><br><br>
-             <button style="float: right" type="submit">Post</button>
+            {% if message %}
+            <p style="color: red; font-size: 20px;float: left;">{{message}}</p>
+            {% endif %}
+            <button style="float: right" type="submit">Post</button>
         </form>
-        {% if message %}
-        <p style="color: red; font-size: 15px">&nbsp;{{message}}</p>
-        {% endif %}
     </div>
 
 

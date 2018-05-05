@@ -21,17 +21,23 @@
 
 <div style="width: 600px; float: left; margin-right: : 30px;">
 <h2>You are following {{count[0]}} users:</h2>
-<table>
+
+
+<table style="width: 700px;">
 {% for i in followings %}
-<tr>
+<tr style="height: 140px;">
     <form action="/follow" method="post">
-        <td>
+        
+        <td style="vertical-align:bottom;">
             <input type="hidden" name="user_id" value="{{i[0]}}">
-            <label style="font-size:24px;">{{i[1]}}</label>
+            <label style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</label><br>
+            <label style="font-size:24px;margin-bottom: 5px;">{{i[2]}}</label><br>
+            <label style="font-size:24px;margin-bottom: 5px;">{{i[3]}}</label>
         </td>
-        <td>
-            <button type="submit" style="width:90px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:16px;padding:10px;">Unfollow</button>
+        <td style="vertical-align:bottom;">
+            <button type="submit" style="width:100px;margin:2px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:18px;padding-top:7px;padding-bottom:7px;">Unfollow</button>
         </td>
+    
     </form>
 </tr>
 {% endfor %}
@@ -44,7 +50,9 @@
 <tr>
     <td>
         {% for i in followers %}
-        <p style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</p>
+        <label style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</label><br>
+        <label style="font-size:24px;margin-bottom: 5px;">{{i[2]}}</label><br>
+        <label style="font-size:24px;margin-bottom: 5px;">{{i[3]}}</label>
     </td>
 </tr>
 {% endfor %}

@@ -29,6 +29,7 @@ class TestServer(unittest.TestCase):
     def test_create_user(self):
         self.assertEqual(create_user("123@qwe.com","Foo Bar","123123","123123","0"),None)
         self.assertEqual(create_user("invalidEmail","Foo Bar","123123","123123","0"),"invalidEmail")
+        self.assertEqual(create_user("           ","XXX Bar","123123","123123","0"),"invalidEmail")
         self.assertEqual(create_user("123@qwe.com","         ","123123","123123","0"),"noName")
         self.assertEqual(create_user("000@qwe.com","XXX Bar","123","123","0"),"short")
         self.assertEqual(create_user("123@qwe.com","Foo Bar","123123","999999","0"),"wrongPWD")
@@ -38,6 +39,7 @@ class TestServer(unittest.TestCase):
     def test_user_login(self):
         self.assertIsInstance(user_login("123@qwe.com","123123"),int)
         self.assertIsInstance(user_login("    Foo    Bar   ","123123"),int)
+        self.assertEqual(user_login("       ","123123"),"space")
         self.assertEqual(user_login("No Name","123123"),"noName")
         self.assertEqual(user_login("123@qwe.com","999999"),"wrongPWD")
 

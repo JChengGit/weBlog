@@ -30,12 +30,20 @@ def home():
         posts=posts)
 @app.route('/home',methods=['POST'])
 def post():
-    user_id = session['current']
+    cur = CONN.cursor()
+    current_id = session['current']
     content = format_space(request.form['content'])
     if (content == 0) or (content == ""):
-        return redirect('/home')
-    cur = CONN.cursor()
-    data = (user_id,content)
+        cur.execute("SELECT name,posts FROM users WHERE id=%s",(current_id,))
+        userinfo = cur.fetchall()[0]
+        username = userinfo[0]
+        post_number = userinfo[1]
+        cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
+        posts = cur.fetchall()
+        posts.reverse()
+        return render_template('home.html',username=username,post_number=post_number,posts=posts,message='Please type in your post.')
+        cur = CONN.cursor()
+    data = (current_id,content)
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
     CONN.commit()
     return redirect('/home')
@@ -49,6 +57,8 @@ def login():
     password = request.form['password']
     name = request.form['name']
     result = user_login(name,password)
+    if result == "space":
+        return render_template('login.html',message='Please type in Email or username.')
     if result == "noName":
         return render_template('login.html',message='User does not exist.')
     if result == "wrongPWD":
@@ -67,7 +77,7 @@ def register():
     name = request.form['name']
     password = request.form['password']
     password2 = request.form['password2']
-    gender = int(request.form['gender'])
+    gender = request.form['gender']
 
     result = create_user(email,name,password,password2,gender)
     if result == 'invalidEmail':
@@ -79,7 +89,7 @@ def register():
     if result == 'wrongPWD':
         return render_template('register.html',message='Please type in same passwords.')
     if result == 'wrongType':
-        return render_template('register.html',message="Only letters or numbers are allowed.")
+        return render_template('register.html',message="Only letters or numbers are allowed to be password.")
     if result == "users_name_key":
         return render_template('register.html',message="Username has already existed.")
     if result == "users_email_key":
@@ -103,7 +113,7 @@ def reset():
         return render_template('setting.html',pwd="Please type in same passwords.")
     if not(re.match(r'^[a-zA-Z0-9]+$',password)):
         return render_template('setting.html',
-            pwd="Only letters or numbers are allowed to be password.") 
+            pwd="Only letters or numbers are allowed.") 
     cur.execute("UPDATE users SET password=%s WHERE id=%s",(password,int(current_id)))
     CONN.commit()
     return render_template('setting.html',pwd="You have changed your password.")
@@ -113,7 +123,7 @@ def reset():
 def find():
     current_id = session['current']
     cur = CONN.cursor()
-    cur.execute("SELECT id,name FROM users WHERE id!=%s AND id NOT IN (SELECT user_id FROM follows WHERE fan_id=%s)",(current_id,current_id))
+    cur.execute("SELECT id,name,gender,email FROM users WHERE id!=%s AND id NOT IN (SELECT user_id FROM follows WHERE fan_id=%s)",(current_id,current_id))
     data = cur.fetchall()
     CONN.commit()
     return render_template('find.html',users=data)
@@ -161,21 +171,23 @@ def logout():
 
 
 def create_user(email, name, password, password2, gender):
-    email = format_space(email).lower()
+    email = format_space(email)
     name = format_space(name)
+    if name==0:
+        return 'noName'
+    if email==0:
+        return 'invalidEmail'
     if password != password2:
         return 'wrongPWD'
     if validate_email(email)==0:
         return 'invalidEmail'
     if len(password)<6:
         return 'short'
-    if name==0:
-        return 'noName'
     if not(re.match(r'^[a-zA-Z0-9]+$',password)):
         return 'wrongType'
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
     cur = CONN.cursor()
-    data = [email,name,password_hash,gender]
+    data = [email.lower(),name,password_hash,gender]
     try:
         cur.execute("INSERT INTO users(email,name,password,gender) VALUES(%s,%s,%s,%s)",data)
         CONN.commit()
@@ -188,8 +200,10 @@ def user_login(name,password):
     cur = CONN.cursor()
     name_f = format_space(name)
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    if name_f == 0:
+        return "space"
     if validate_email(name_f)==1:
-        cur.execute("SELECT password,id FROM users WHERE email=%s",(name_f,))
+        cur.execute("SELECT password,id FROM users WHERE email=%s",(name_f.lower(),))
     else:
         cur.execute("SELECT password,id FROM users WHERE name=%s",(name_f,))
     info = cur.fetchall()

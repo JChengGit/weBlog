@@ -23,17 +23,19 @@
 <p style="color:red">{{message}}</p>
 {% endif %}
 
-<table>
+<table style="width: 700px;">
 {% for i in users %}
-<tr>
+<tr style="height: 140px;">
     <form action="/find" method="post">
         
-        <td>
+        <td style="vertical-align:bottom;">
             <input type="hidden" name="user_id" value="{{i[0]}}">
-            <label style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</label>
+            <label style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</label><br>
+            <label style="font-size:24px;margin-bottom: 5px;">{{i[2]}}</label><br>
+            <label style="font-size:24px;margin-bottom: 5px;">{{i[3]}}</label>
         </td>
-        <td>
-            <button type="submit" style="width:90px;margin:2px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:18px;padding-top:7px;padding-bottom:7px;">Follow</button>
+        <td style="vertical-align:bottom;">
+            <button type="submit" style="width:100px;margin:2px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:18px;padding-top:7px;padding-bottom:7px;">Follow</button>
         </td>
     
     </form>

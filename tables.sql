@@ -3,7 +3,7 @@ CREATE TABLE users (
 	password	text,
 	email		text 	UNIQUE,
 	name		text	UNIQUE,
-	gender		int,
+	gender		text,
 	posts		int	default 0,
 	followers	int	default 0,
 	followings	int	default 0
