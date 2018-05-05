@@ -1,10 +1,8 @@
 import re,psycopg2,hashlib
-from flask_bootstrap import Bootstrap
 from flask import Flask,request,render_template,redirect,make_response,session
 
 CONN = None
 app = Flask(__name__)
-bootstrap = Bootstrap(app)
 app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x81'
 
 @app.route('/')

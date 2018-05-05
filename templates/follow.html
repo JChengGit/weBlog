@@ -23,7 +23,7 @@
 <h2>You are following {{count[0]}} users:</h2>
 
 
-<table style="width: 700px;">
+<table style="width: 600px;">
 {% for i in followings %}
 <tr style="height: 140px;">
     <form action="/follow" method="post">
@@ -45,9 +45,9 @@
 </div>
 
 <div style="width: 600px; float: left;">
-<h2>Your have {{count[1]}} followers:</h2>
+<h2 style="margin-bottom: 40px;">Your have {{count[1]}} followers:</h2>
 <table>
-<tr>
+<tr style="height: 210px;">
     <td>
         {% for i in followers %}
         <label style="font-size:24px;margin-bottom: 5px;">{{i[1]}}</label><br>
