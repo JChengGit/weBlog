@@ -22,6 +22,18 @@ unittest部分。<br>
 follow、unfollow功能及其计数；<br>
 修改tables.sql中的bug，重建数据库；<br>
 弃用Bootstrap模板，改用原生CSS实现。<br>
-
+<br>
+5.6更新<br>
+前端调整。<br>
+<br>
 
 </p>
+
+
+
+
+
+
+
+
+

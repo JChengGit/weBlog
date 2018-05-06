@@ -14,7 +14,6 @@ def index():
 def home(): 
     if 'current' not in session:
         return redirect('/login')
-
     current_id = session['current']
     cur = CONN.cursor()
     cur.execute("SELECT name,posts,email FROM users WHERE id=%s",(current_id,))
@@ -33,15 +32,16 @@ def post():
     current_id = session['current']
     content = format_space(request.form['content'])
     if (content == 0) or (content == ""):
-        cur.execute("SELECT name,posts FROM users WHERE id=%s",(current_id,))
+        cur.execute("SELECT name,posts,email FROM users WHERE id=%s",(current_id,))
         userinfo = cur.fetchall()[0]
         username = userinfo[0]
         post_number = userinfo[1]
+        email = userinfo[2]
         cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
         posts = cur.fetchall()
         posts.reverse()
         return render_template('post.html',username=username,post_number=post_number,
-            posts=posts,message='Please type in your post.')
+            posts=posts,email=email,message='Please type in your post.')
         cur = CONN.cursor()
     data = (current_id,content)
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
@@ -78,7 +78,6 @@ def register():
     password = request.form['password']
     password2 = request.form['password2']
     gender = request.form['gender']
-
     result = create_user(email,name,password,password2,gender)
     if result == 'invalidEmail':
         return render_template('register.html',message='Please type in a valid Email.')
@@ -105,8 +104,11 @@ def setting():
 def reset():
     current_id = session['current']
     cur = CONN.cursor()
+    cur.execute("SELECT password FROM users WHERE id=%s",(current_id,))
+    originPWD = cur.fetchall()[0][0]
     password = request.form['password']
     password2 = request.form['password2']
+    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
     if len(password) < 6:
         return render_template('setting.html',pwd="Password has to be at least 6 characters.")
     if password2 != password:
@@ -114,6 +116,8 @@ def reset():
     if not(re.match(r'^[a-zA-Z0-9]+$',password)):
     	return render_template('setting.html',
     		pwd="Only letters or numbers are allowed.") 
+    if password_hash == originPWD:
+        return render_template('setting.html',pwd="Same as previous password.")
     cur.execute("UPDATE users SET password=%s WHERE id=%s",(password,int(current_id)))
     CONN.commit()
     return render_template('setting.html',pwd="You have changed your password.")

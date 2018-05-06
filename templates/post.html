@@ -24,7 +24,7 @@
 	<div class="post">
 		<form action="/home" method="post">
 			<h3 style="margin-left: 20px;padding-top: 20px;">Write your post.</h3>
-			<textarea rows=5 name="content"></textarea>
+			<textarea rows=5  wrap="hard" name="content"></textarea>
 			{% if message %}
 			<p style="margin-left:20px;margin-top: 5px; width:500px;float:left;color:red;font-size:15px">{{message}}</p>
 			{% endif %}
