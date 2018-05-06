@@ -17,15 +17,16 @@ def home():
 
     current_id = session['current']
     cur = CONN.cursor()
-    cur.execute("SELECT name,posts FROM users WHERE id=%s",(current_id,))
+    cur.execute("SELECT name,posts,email FROM users WHERE id=%s",(current_id,))
     userinfo = cur.fetchall()[0]
     username = userinfo[0]
     post_number = userinfo[1]
+    email = userinfo[2]
     cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
     posts = cur.fetchall()
     posts.reverse()
-    return render_template('home.html',username=username,post_number=post_number,
-        posts=posts)
+    return render_template('post.html',username=username,post_number=post_number,
+        posts=posts,email=email)
 @app.route('/home',methods=['POST'])
 def post():
     cur = CONN.cursor()
@@ -39,7 +40,8 @@ def post():
         cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
         posts = cur.fetchall()
         posts.reverse()
-        return render_template('home.html',username=username,post_number=post_number,posts=posts,message='Please type in your post.')
+        return render_template('post.html',username=username,post_number=post_number,
+            posts=posts,message='Please type in your post.')
         cur = CONN.cursor()
     data = (current_id,content)
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
@@ -171,16 +173,16 @@ def logout():
 def create_user(email, name, password, password2, gender):
     email = format_space(email)
     name = format_space(name)
-    if name==0:
-        return 'noName'
     if email==0:
         return 'invalidEmail'
-    if password != password2:
-        return 'wrongPWD'
     if validate_email(email)==0:
         return 'invalidEmail'
+    if name==0:
+        return 'noName'
     if len(password)<6:
         return 'short'
+    if password != password2:
+        return 'wrongPWD'
     if not(re.match(r'^[a-zA-Z0-9]+$',password)):
     	return 'wrongType'
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
