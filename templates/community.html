@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>User Login</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+</head>
+<body>
+
+
+<ul>
+    <li style="margin-left:160px"><a class="active" href="/community">Community</a></li>
+    <li><a href="/home">Home</a></li>
+    <li><a href="/find">Find</a></li>
+    <li><a href="/follow">Follow</a></li>
+    <li><a href="/favorates">Favorates</a></li>
+    <li><a href="/setting">Setting</a></li>
+    <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
+</ul>
+
+<div style="display: -webkit-box;">
+
+<div style="margin-top: 150px;">
+
+    {% for i in postlist %}
+    <div class="postlist">
+        <h4>{{i[0]}}</h4>
+        <p>{{i[1]}}</p>
+        <p style="font-size:15px;padding-left: 630px">{{i[2]}}</p>
+    </div>
+    {% endfor %}
+</div>
+
+
+
+<div class="card">
+    <h2 style="margin-left: 30px">{{userinfo[0]}}</h2>
+    <h4 style="margin-left: 30px">{{userinfo[1]}}</h4>
+    
+</div>
+
+</div>
+
+</body>
+</html>

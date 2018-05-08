@@ -1,14 +1,17 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="static/post.css">
+    <title>User Login</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
 </head>
-<body >
+<body>
+
 
 <ul>
-    <li style="margin-left:160px"><a class="active" href="/home">Home</a></li>
+    <li style="margin-left:160px"><a href="/community">Community</a></li>
+    <li><a class="active" href="/home">Home</a></li>
     <li><a href="/find">Find</a></li>
     <li><a href="/follow">Follow</a></li>
     <li><a href="/favorates">Favorates</a></li>
@@ -16,34 +19,38 @@
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
 
-
-
-<div>
-	<h1>Welcome, {{username}}.</h1>
-    <p>You have {{post_number}} posts.</p>
-</div>
+<div style="display: -webkit-box;">
 
 <div>
-    <form action="/home" method="post">
-        <textarea style="width: 1180px;" name="content" placeholder="Type in your content" rows="4" ></textarea><br><br>
-        {% if message %}
-        <p style="color: red; font-size: 20px;float: left;">{{message}}</p>
-        {% endif %}
-        <button style="float: right" type="submit">Post</button>
-    </form>
-</div>
+    <div class="post">
+        <form action="/home" method="post">
+            <h3 style="margin-left: 20px;padding-top: 20px;">Write your post.</h3>
+            <textarea rows=5  wrap="hard" name="content"></textarea>
+            {% if message %}
+            <p style="margin-left:20px;margin-top: 5px; width:500px;float:left;color:red;font-size:15px">{{message}}</p>
+            {% endif %}
+            <button style="float: right; margin: 5px 18px 10px 0px;" type="submit">Post</button>
+        </form>
+    </div>
 
-
-<div class="postlist">
-    {% if posts %}
     {% for i in posts %}
-    <p style="margin-top: 50px">{{i[0]}}</p>
-    <p style="float: right;font-size:15px;padding-right: 30px">{{i[1]}}</p>
+    <div class="postlist">
+        <p>{{i[0]}}</p>
+        <p style="font-size:15px;padding-left: 630px">{{i[1]}}</p>
+    </div>
     {% endfor %}
-    {% endif %}
 </div>
 
 
+
+<div class="card">
+    <h2 style="margin-left: 30px">{{username}}</h2>
+    <h4 style="margin-left: 30px">{{email}}</h4>
+    <p style="margin-left: 30px">{{post_number}} post.</p>
+    
+</div>
+
+</div>
 
 </body>
 </html>

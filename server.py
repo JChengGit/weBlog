@@ -10,6 +10,21 @@ def index():
     return redirect('/login')
 
 
+@app.route('/community',methods=['GET'])
+def view():
+    if 'current' not in session:
+        return redirect('/login')
+    current_id = session['current']
+    cur = CONN.cursor()
+    cur.execute("SELECT distinct(u.name),p.content,p.create_at FROM users u, posts p, follows f WHERE f.fan_id=%s AND (u.id=f.user_id or u.id=%s) AND u.id=p.user_id;",(current_id,current_id))
+    postlist = cur.fetchall()
+    postlist.reverse()
+    cur.execute("SELECT name,email FROM users WHERE id=%s",(current_id,))
+    userinfo = cur.fetchall()[0]
+
+    return render_template('community.html',postlist=postlist,userinfo=userinfo)
+
+
 @app.route('/home',methods=['GET'])
 def home(): 
     if 'current' not in session:
@@ -24,7 +39,7 @@ def home():
     cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
     posts = cur.fetchall()
     posts.reverse()
-    return render_template('post.html',username=username,post_number=post_number,
+    return render_template('home.html',username=username,post_number=post_number,
         posts=posts,email=email)
 @app.route('/home',methods=['POST'])
 def post():
@@ -40,7 +55,7 @@ def post():
         cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
         posts = cur.fetchall()
         posts.reverse()
-        return render_template('post.html',username=username,post_number=post_number,
+        return render_template('home.html',username=username,post_number=post_number,
             posts=posts,email=email,message='Please type in your post.')
         cur = CONN.cursor()
     data = (current_id,content)
@@ -65,7 +80,7 @@ def login():
         return render_template('login.html',message='Invalid password.')
     else:
         session['current'] = result
-        return redirect('/home')
+        return redirect('/community')
 
 
 @app.route('/register',methods=['GET'])
@@ -99,6 +114,8 @@ def register():
 
 @app.route('/setting',methods = ['GET'])
 def setting():
+    if 'current' not in session:
+        return redirect('/login')
     return render_template('setting.html')
 @app.route('/setting',methods = ['POST'])
 def reset():
@@ -125,6 +142,8 @@ def reset():
 
 @app.route('/find',methods=['GET'])
 def find():
+    if 'current' not in session:
+        return redirect('/login')
     current_id = session['current']
     cur = CONN.cursor()
     cur.execute("SELECT id,name,gender,email FROM users WHERE id!=%s AND id NOT IN (SELECT user_id FROM follows WHERE fan_id=%s)",(current_id,current_id))
@@ -144,6 +163,8 @@ def found():
 
 @app.route('/follow',methods=['GET'])
 def follow():
+    if 'current' not in session:
+        return redirect('/login')
     cur = CONN.cursor()
     current_id = session['current']
     cur.execute("SELECT followings,followers FROM users WHERE id=%s",(current_id,))
@@ -167,6 +188,8 @@ def unfollow():
 
 @app.route('/favorates')
 def favorates():
+    if 'current' not in session:
+        return redirect('/login')
     return render_template('favorates.html')
 @app.route('/logout',methods=['GET'])
 def logout():

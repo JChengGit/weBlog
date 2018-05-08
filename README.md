@@ -1,5 +1,4 @@
 <h2>进度</h2>
-<p style="margin-left:100px">
 在127.0.0.1:5000中运行，会自动转到注册界面；<br>
 在/login中登录，在/register中注册，使用邮箱注册；<br>
 <br>
@@ -26,6 +25,14 @@ follow、unfollow功能及其计数；<br>
 5.6更新<br>
 前端调整。<br>
 <br>
+5.8更新<br>
+增加community页面，查看自己和关注者的post；<br>
+<br>
+
+
+
+
+
 
 </p>
 
