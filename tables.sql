@@ -14,6 +14,7 @@ CREATE TABLE posts (
 	user_id		int	REFERENCES users,
 	repost_id	int	REFERENCES posts,
 	content		text not null,
+	liked		int	default 0,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0)
 );
 
@@ -68,7 +69,27 @@ CREATE TRIGGER posts_counter AFTER INSERT OR DELETE ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_count();
 
 
-CREATE FUNCTION follows_couter() RETURNS TRIGGER AS $follows_table$
+
+
+CREATE FUNCTION like_post_count() RETURNS TRIGGER AS $likeposts_table$
+	BEGIN
+		IF (TG_OP = 'INSERT') THEN
+			UPDATE posts SET liked=liked+1 WHERE id=new.post_id;
+			RETURN NEW;
+		ELSIF (TG_OP = 'DELETE') THEN
+			UPDATE posts SET liked=liked-1 WHERE id=old.post_id;
+			RETURN OLD;
+		END IF;
+	END;
+$likeposts_table$ LANGUAGE plpgsql;
+
+CREATE TRIGGER like_post_counter AFTER INSERT OR DELETE ON likeposts
+FOR EACH ROW EXECUTE PROCEDURE like_post_count();
+
+
+
+
+CREATE FUNCTION follows_count() RETURNS TRIGGER AS $follows_table$
 	BEGIN
 		IF (TG_OP = 'INSERT') THEN
 			UPDATE users SET followers=followers+1 WHERE id=new.user_id;
@@ -77,10 +98,10 @@ CREATE FUNCTION follows_couter() RETURNS TRIGGER AS $follows_table$
 		ELSIF (TG_OP = 'DELETE') THEN
 			UPDATE users SET followers=followers-1 WHERE id=old.user_id;
 			UPDATE users SET followings=followings-1 WHERE id=old.fan_id;
-			RETURN NEW;
+			RETURN OLD;
 		END IF;
 	END;
 $follows_table$ LANGUAGE plpgsql;
 
-CREATE TRIGGER follows_couter AFTER INSERT OR DELETE ON follows
-FOR EACH ROW EXECUTE PROCEDURE follows_couter();
+CREATE TRIGGER follows_counter AFTER INSERT OR DELETE ON follows
+FOR EACH ROW EXECUTE PROCEDURE follows_count();

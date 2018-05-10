@@ -21,8 +21,13 @@ def view():
     postlist.reverse()
     cur.execute("SELECT name,email FROM users WHERE id=%s",(current_id,))
     userinfo = cur.fetchall()[0]
+    return render_template('community.html',postlist=postlist,userinfo=userinfo)
+@app.route('/community',methods=['POST'])
+def commu():
+
 
     return render_template('community.html',postlist=postlist,userinfo=userinfo)
+
 
 
 @app.route('/home',methods=['GET'])
