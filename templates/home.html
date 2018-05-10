@@ -35,8 +35,12 @@
 
     {% for i in posts %}
     <div class="postlist">
-        <p>{{i[0]}}</p>
-        <p style="font-size:15px;padding-left: 630px">{{i[1]}}</p>
+    <form action="/post/{{i[0]}}" method="get">
+        <p>{{i[1]}}</p>
+        <div style="display: inline;">
+            <button style="font-size:15px;margin-left: 500px">Delete</button>
+            <label style="font-size:15px;padding-left: 30px">{{i[2]}}</label>
+        </div>
     </div>
     {% endfor %}
 </div>
@@ -47,8 +51,8 @@
     <h2 style="margin-left: 30px">{{username}}</h2>
     <h4 style="margin-left: 30px">{{email}}</h4>
     <p style="margin-left: 30px">{{post_number}} post.</p>
-    
 </div>
+
 
 </div>
 

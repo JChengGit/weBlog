@@ -16,7 +16,7 @@ def view():
         return redirect('/login')
     current_id = session['current']
     cur = CONN.cursor()
-    cur.execute("SELECT distinct(u.name),p.content,p.create_at FROM users u, posts p, follows f WHERE f.fan_id=%s AND (u.id=f.user_id or u.id=%s) AND u.id=p.user_id;",(current_id,current_id))
+    cur.execute("SELECT distinct(u.name),p.content,p.create_at FROM users u, posts p, follows f WHERE f.fan_id=%s AND (u.id=f.user_id or u.id=%s) AND p.user_id=u.id;",(current_id,current_id))
     postlist = cur.fetchall()
     postlist.reverse()
     cur.execute("SELECT name,email FROM users WHERE id=%s",(current_id,))
@@ -41,7 +41,7 @@ def home():
     username = userinfo[0]
     post_number = userinfo[1]
     email = userinfo[2]
-    cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
+    cur.execute("SELECT id,content,create_at FROM posts WHERE user_id=%s",(current_id,))
     posts = cur.fetchall()
     posts.reverse()
     return render_template('home.html',username=username,post_number=post_number,
@@ -67,6 +67,16 @@ def post():
     cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
     CONN.commit()
     return redirect('/home')
+
+
+@app.route('/post/<post_id>',methods=['GET'])
+def delete_post(post_id):
+    if 'current' not in session:
+        return redirect('/login')
+    cur = CONN.cursor()
+    cur.execute("DELETE FROM posts WHERE id=%s",(post_id,))
+    return redirect('/home')
+
 
 
 @app.route('/login',methods=['GET'])

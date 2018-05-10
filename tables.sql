@@ -13,7 +13,7 @@ CREATE TABLE posts (
 	id			serial	PRIMARY KEY,
 	user_id		int	REFERENCES users,
 	repost_id	int	REFERENCES posts,
-	content		text not null,
+	content		text 	not null,
 	liked		int	default 0,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0)
 );
