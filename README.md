@@ -28,8 +28,9 @@ follow、unfollow功能及其计数；<br>
 5.8更新<br>
 增加community页面，查看自己和关注者的post；<br>
 <br>
-
-
+5.10更新<br>
+数据库增加trigger给点赞计数。<br>
+<br>
 
 
 
