@@ -3,8 +3,23 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>User Login</title>
+    <title>Home</title>
     <link rel="stylesheet" type="text/css" href="static/style.css">
+<script>
+function update(id){
+    var content_id = 'current_post'+id
+    var content = document.getElementById(content_id).innerText
+    document.getElementById(id).innerHTML="\
+    <div class='postlist' style='width:810px;padding:30px 20px 20px 20px'>\
+    <form action='/post' method='post'>\
+    <input type='hidden' name='post_id' value='"+id+"'>\
+    <textarea rows=3 name='uptxt' style='margin:0px 0px'>"+content+"</textarea>\
+    <button style='font-size:15px;margin:10px 0px 0px 710px' type='submit'>Update</button>\
+    </form>\
+    </div>"
+}
+</script>
+
 </head>
 <body>
 
@@ -22,24 +37,35 @@
 <div style="display: -webkit-box;">
 
 <div>
-    <div class="post">
+    <div class="post" style="height: 240px;">
         <form action="/home" method="post">
             <h3 style="margin-left: 20px;padding-top: 20px;">Write your post.</h3>
             <textarea rows=5  wrap="hard" name="content"></textarea>
             {% if message %}
-            <p style="margin-left:20px;margin-top: 5px; width:500px;float:left;color:red;font-size:15px">{{message}}</p>
+            <p style="margin:5px 0px 20px 20px; width:500px;float:left;color:red;font-size:15px">{{message}}</p>
             {% endif %}
             <button style="float: right; margin: 5px 18px 10px 0px;" type="submit">Post</button>
         </form>
     </div>
 
     {% for i in posts %}
-    <div class="postlist">
-    <form action="/post/{{i[0]}}" method="get">
-        <p>{{i[1]}}</p>
-        <div style="display: inline;">
-            <button style="font-size:15px;margin-left: 500px">Delete</button>
-            <label style="font-size:15px;padding-left: 30px">{{i[2]}}</label>
+    <div id="{{i[0]}}">
+        <div class="postlist">
+            <p id="current_post{{i[0]}}">{{i[1]}}</p>
+            <div style="display: -webkit-box;">
+                <div>
+                    <button onclick="update({{i[0]}})" style="font-size:15px;margin-left: 350px">Update</button>
+                </div>
+                <div id="delete_button">
+                    <form action="/post/delete" method="post">
+                        <input type="hidden" name="post_id" value="{{i[0]}}">
+                        <button style="font-size:15px;margin-left: 30px;background-color: red">Delete</button>
+                    </form>
+                </div>
+                <div>
+                    <label style="font-size:15px;padding-left: 30px">{{i[2]}}</label>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}

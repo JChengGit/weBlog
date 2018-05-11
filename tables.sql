@@ -21,8 +21,8 @@ CREATE TABLE posts (
 CREATE TABLE comments (
 	id			serial	PRIMARY KEY,
 	user_id		int	REFERENCES users,
-	post_id		int	REFERENCES posts,
-	comment_id	int	REFERENCES comments,
+	post_id		int	REFERENCES posts	 ON DELETE CASCADE,
+	comment_id	int	REFERENCES comments	 ON DELETE CASCADE,
 	content		text not null,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0)
 );
@@ -35,20 +35,20 @@ CREATE TABLE follows (
 
 CREATE TABLE favorates (
 	user_id		int	REFERENCES users,
-	post_id		int	REFERENCES posts,
+	post_id		int	REFERENCES posts	 ON DELETE CASCADE,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 	UNIQUE(user_id,post_id)
 );
 
 CREATE TABLE likeposts (
 	user_id		int	REFERENCES users,
-	post_id		int	REFERENCES posts,
+	post_id		int	REFERENCES posts	ON DELETE CASCADE,
 	UNIQUE(user_id,post_id)
 );
 
 CREATE TABLE likecmts (
 	user_id		int	REFERENCES users,
-	comment_id	int	REFERENCES comments,
+	comment_id	int	REFERENCES comments	ON DELETE CASCADE,
 	UNIQUE(user_id,comment_id)
 );
 

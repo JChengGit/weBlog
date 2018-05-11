@@ -21,16 +21,47 @@ def home():
     username = userinfo[0]
     post_number = userinfo[1]
     email = userinfo[2]
-    cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
+    cur.execute("SELECT id,content,create_at FROM posts WHERE user_id=%s ORDER BY create_at",(current_id,))
     posts = cur.fetchall()
     posts.reverse()
-    return render_template('post.html',username=username,post_number=post_number,
+    return render_template('home.html',username=username,post_number=post_number,
         posts=posts,email=email)
 @app.route('/home',methods=['POST'])
 def post():
     cur = CONN.cursor()
     current_id = session['current']
     content = format_space(request.form['content'])
+    if (content == 0) or (content == ""):
+        current_id = session['current']
+        cur = CONN.cursor()
+        cur.execute("SELECT name,posts,email FROM users WHERE id=%s",(current_id,))
+        userinfo = cur.fetchall()[0]
+        username = userinfo[0]
+        post_number = userinfo[1]
+        email = userinfo[2]
+        cur.execute("SELECT id,content,create_at FROM posts WHERE user_id=%s ORDER BY create_at",(current_id,))
+        posts = cur.fetchall()
+        posts.reverse()
+        return render_template('home.html',username=username,post_number=post_number,
+            posts=posts,email=email,message='Please type in your post.')
+    data = (current_id,content)
+    cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
+    CONN.commit()
+    return redirect('/home')
+
+
+@app.route('/post/delete',methods=['POST'])
+def delete_post():
+    cur = CONN.cursor()
+    post_id = request.form['post_id']
+    cur.execute("DELETE FROM posts WHERE id=%s",(post_id,))
+    CONN.commit()
+    return redirect('/home')
+@app.route('/post',methods=['POST'])
+def update_post():
+    cur = CONN.cursor()
+    post_id = request.form['post_id']
+    content = format_space(request.form['uptxt'])
     if (content == 0) or (content == ""):
         cur.execute("SELECT name,posts,email FROM users WHERE id=%s",(current_id,))
         userinfo = cur.fetchall()[0]
@@ -40,13 +71,41 @@ def post():
         cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
         posts = cur.fetchall()
         posts.reverse()
-        return render_template('post.html',username=username,post_number=post_number,
-            posts=posts,email=email,message='Please type in your post.')
-        cur = CONN.cursor()
-    data = (current_id,content)
-    cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
+        return render_template('home.html',username=username,post_number=post_number,
+            posts=posts,email=email,p_message='Please type in your post.')
+    data = [content,post_id]
+    cur.execute("UPDATE posts SET content=%s WHERE id=%s",data)
     CONN.commit()
     return redirect('/home')
+
+
+@app.route('/community',methods=['GET'])
+def view():
+    if 'current' not in session:
+        return redirect('/login')
+    current_id = session['current']
+    cur = CONN.cursor()
+    cur.execute("SELECT distinct(u.name),p.id,p.content,p.liked,p.create_at FROM users u, posts p, follows f WHERE f.fan_id=%s AND (u.id=f.user_id OR u.id=%s) AND p.user_id=u.id ORDER BY create_at;",(current_id,current_id))
+    postlist = cur.fetchall()
+    postlist.reverse()
+    cur.execute("SELECT name,email FROM users WHERE id=%s",(current_id,))
+    userinfo = cur.fetchall()[0]
+    return render_template('community.html',postlist=postlist,userinfo=userinfo)
+@app.route('/community/like',methods=['GET'])
+def like_post():
+    cur = CONN.cursor()
+    current_id = session['current']
+    post_id = int(request.args.get('post_id'))
+    data = [current_id,post_id]
+    cur.execute("SELECT * FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    if len(cur.fetchall())==0:
+        cur.execute("INSERT INTO likeposts values(%s,%s)",data)
+    else:
+        cur.execute("DELETE FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    cur.execute("SELECT liked FROM posts WHERE id=%s",(post_id,))
+    liked = cur.fetchall()[0][0]
+    CONN.commit()
+    return str(liked)
 
 
 @app.route('/login',methods=['GET'])
@@ -65,7 +124,7 @@ def login():
         return render_template('login.html',message='Invalid password.')
     else:
         session['current'] = result
-        return redirect('/home')
+        return redirect('/community')
 
 
 @app.route('/register',methods=['GET'])
@@ -99,6 +158,8 @@ def register():
 
 @app.route('/setting',methods = ['GET'])
 def setting():
+    if 'current' not in session:
+        return redirect('/login')
     return render_template('setting.html')
 @app.route('/setting',methods = ['POST'])
 def reset():
@@ -125,6 +186,8 @@ def reset():
 
 @app.route('/find',methods=['GET'])
 def find():
+    if 'current' not in session:
+        return redirect('/login')
     current_id = session['current']
     cur = CONN.cursor()
     cur.execute("SELECT id,name,gender,email FROM users WHERE id!=%s AND id NOT IN (SELECT user_id FROM follows WHERE fan_id=%s)",(current_id,current_id))
@@ -144,6 +207,8 @@ def found():
 
 @app.route('/follow',methods=['GET'])
 def follow():
+    if 'current' not in session:
+        return redirect('/login')
     cur = CONN.cursor()
     current_id = session['current']
     cur.execute("SELECT followings,followers FROM users WHERE id=%s",(current_id,))
@@ -164,10 +229,13 @@ def unfollow():
     return redirect('/follow')
 
 
-
 @app.route('/favorates')
 def favorates():
+    if 'current' not in session:
+        return redirect('/login')
     return render_template('favorates.html')
+
+
 @app.route('/logout',methods=['GET'])
 def logout():
     session.pop('current',None)
@@ -232,7 +300,7 @@ def validate_email(addr):
     return 0
 
 
-CONN = psycopg2.connect(dbname="testDB", user="postgres",
+CONN = psycopg2.connect(dbname="weibo", user="postgres",
     password="456", host="127.0.0.1", port="5432")
 if __name__ == '__main__':
     app.run()

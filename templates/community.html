@@ -2,9 +2,26 @@
 
 <html>
 <head>
-    <meta charset="utf-8" />
-    <title>User Login</title>
-    <link rel="stylesheet" type="text/css" href="static/style.css">
+<meta charset="utf-8" />
+<title>Community</title>
+<link rel="stylesheet" type="text/css" href="static/style.css">
+<script type="text/javascript">
+function like_post(post_id)
+{
+    var xmlhttp;
+    var url = "/community/like?post_id="+post_id;
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.onreadystatechange=function()
+    {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        {
+            document.getElementById("like_counter"+post_id).innerHTML=xmlhttp.responseText;
+        }
+    }
+    xmlhttp.open("GET",url,true);
+    xmlhttp.send();
+}
+</script>
 </head>
 <body>
 
@@ -26,8 +43,12 @@
     {% for i in postlist %}
     <div class="postlist">
         <h4>{{i[0]}}</h4>
-        <p>{{i[1]}}</p>
-        <p style="font-size:15px;padding-left: 630px">{{i[2]}}</p>
+        <p>{{i[2]}}</p>
+        <div style="display: -webkit-box">
+            <p id="like_counter{{i[1]}}" style="font-size:16px;padding-left:530px">{{i[3]}} </p>
+            <p onclick="like_post({{i[1]}})" style="font-size:16px;padding-left:6px;cursor:pointer">like</p>
+            <p style="font-size:16px;padding-left:30px">{{i[4]}}</p>
+        </div>
     </div>
     {% endfor %}
 </div>

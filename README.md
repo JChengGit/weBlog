@@ -31,7 +31,11 @@ follow、unfollow功能及其计数；<br>
 5.10更新<br>
 数据库增加trigger给点赞计数。<br>
 <br>
-
+5.11更新<br>
+点赞，使用Ajax以避免刷新整个页面；<br>
+修改和删除post；<br>
+数据库增加级联删除。<br>
+<br>
 
 
 
