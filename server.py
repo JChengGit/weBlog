@@ -1,5 +1,5 @@
 import re,psycopg2,hashlib
-from flask import Flask,request,render_template,redirect,make_response,session
+from flask import Flask,request,render_template,redirect,make_response,session,flash
 
 CONN = None
 app = Flask(__name__)
@@ -61,18 +61,20 @@ def delete_post():
 def update_post():
     cur = CONN.cursor()
     post_id = request.form['post_id']
+    current_id = session['current']
     content = format_space(request.form['uptxt'])
     if (content == 0) or (content == ""):
+        current_id = session['current']
         cur.execute("SELECT name,posts,email FROM users WHERE id=%s",(current_id,))
         userinfo = cur.fetchall()[0]
         username = userinfo[0]
         post_number = userinfo[1]
         email = userinfo[2]
-        cur.execute("SELECT content,create_at FROM posts WHERE user_id=%s",(current_id,))
+        cur.execute("SELECT id,content,create_at FROM posts WHERE user_id=%s",(current_id,))
         posts = cur.fetchall()
         posts.reverse()
         return render_template('home.html',username=username,post_number=post_number,
-            posts=posts,email=email,p_message='Please type in your post.')
+            posts=posts,email=email,p_message='Update failed, please type in your post.')
     data = [content,post_id]
     cur.execute("UPDATE posts SET content=%s WHERE id=%s",data)
     CONN.commit()

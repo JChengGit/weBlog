@@ -48,6 +48,12 @@ function update(id){
         </form>
     </div>
 
+    <div>
+        {% if p_message %}
+        <p style="margin:5px 0px 20px 270px; width:500px;float:left;color:red;font-size:18px">{{p_message}}</p>
+        {% endif %}
+    </div><br>
+
     {% for i in posts %}
     <div id="{{i[0]}}">
         <div class="postlist">
@@ -70,8 +76,6 @@ function update(id){
     </div>
     {% endfor %}
 </div>
-
-
 
 <div class="card">
     <h2 style="margin-left: 30px">{{username}}</h2>
