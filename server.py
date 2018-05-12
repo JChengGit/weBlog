@@ -50,6 +50,35 @@ def post():
     return redirect('/home')
 
 
+@app.route('/community',methods=['GET'])
+def view():
+    if 'current' not in session:
+        return redirect('/login')
+    current_id = session['current']
+    cur = CONN.cursor()
+    cur.execute("SELECT distinct(u.name),p.id,p.content,p.liked,p.create_at FROM users u, posts p, follows f WHERE f.fan_id=%s AND (u.id=f.user_id OR u.id=%s) AND p.user_id=u.id ORDER BY create_at;",(current_id,current_id))
+    postlist = cur.fetchall()
+    postlist.reverse()
+    cur.execute("SELECT name,email FROM users WHERE id=%s",(current_id,))
+    userinfo = cur.fetchall()[0]
+    return render_template('community.html',postlist=postlist,userinfo=userinfo)
+@app.route('/community/like',methods=['GET'])
+def like_post():
+    cur = CONN.cursor()
+    current_id = session['current']
+    post_id = int(request.args.get('post_id'))
+    data = [current_id,post_id]
+    cur.execute("SELECT * FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    if len(cur.fetchall())==0:
+        cur.execute("INSERT INTO likeposts values(%s,%s)",data)
+    else:
+        cur.execute("DELETE FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    cur.execute("SELECT liked FROM posts WHERE id=%s",(post_id,))
+    liked = cur.fetchall()[0][0]
+    CONN.commit()
+    return str(liked)
+
+
 @app.route('/post/delete',methods=['POST'])
 def delete_post():
     cur = CONN.cursor()
@@ -81,30 +110,39 @@ def update_post():
     return redirect('/home')
 
 
-@app.route('/community',methods=['GET'])
-def view():
-    if 'current' not in session:
-        return redirect('/login')
-    current_id = session['current']
-    cur = CONN.cursor()
-    cur.execute("SELECT distinct(u.name),p.id,p.content,p.liked,p.create_at FROM users u, posts p, follows f WHERE f.fan_id=%s AND (u.id=f.user_id OR u.id=%s) AND p.user_id=u.id ORDER BY create_at;",(current_id,current_id))
-    postlist = cur.fetchall()
-    postlist.reverse()
-    cur.execute("SELECT name,email FROM users WHERE id=%s",(current_id,))
-    userinfo = cur.fetchall()[0]
-    return render_template('community.html',postlist=postlist,userinfo=userinfo)
-@app.route('/community/like',methods=['GET'])
-def like_post():
+@app.route('/comment',methods=['POST'])
+def comment():
     cur = CONN.cursor()
     current_id = session['current']
-    post_id = int(request.args.get('post_id'))
-    data = [current_id,post_id]
-    cur.execute("SELECT * FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    text_id = request.form['text_id']
+    content = request.form['content']
+    comment_type = request.form['comment_type']
+    data = [current_id,text_id,content]
+    if comment_type == 'onPost':
+        cur.execute("INSERT INTO comments(user_id,post_id,content) VALUES(%s,%s,%s)",data)
+    if comment_type == 'onComment':
+        cur.execute("INSERT INTO comments(user_id,comment_id,content) VALUES(%s,%s,%s)",data)
+    CONN.commit()
+    return redirect('/community')
+@app.route('/comment/delete',methods=['GET'])
+def delete_comment():
+    cur = CONN.cursor()
+    comment_id = request.args.get('comment_id')
+    cur.execute("DELETE FROM comments WHERE id=%s",(comment_id,))
+    CONN.commit()
+    return redirect('/community')
+@app.route('/comment/like',methods=['GET'])
+def like_comment():
+    cur = CONN.cursor()
+    current_id = session['current']
+    comment_id = request.args.get('comment_id')
+    data = [current_id,comment_id]
+    cur.execute("SELECT * FROM likecmts WHERE user_id=%s AND comment_id=%s",data)
     if len(cur.fetchall())==0:
-        cur.execute("INSERT INTO likeposts values(%s,%s)",data)
+        cur.execute("INSERT INTO likecmts values(%s,%s)",data)
     else:
-        cur.execute("DELETE FROM likeposts WHERE user_id=%s AND post_id=%s",data)
-    cur.execute("SELECT liked FROM posts WHERE id=%s",(post_id,))
+        cur.execute("DELETE FROM likecmts WHERE user_id=%s AND comment_id=%s",data)
+    cur.execute("SELECT liked FROM comments WHERE id=%s",(comment_id,))
     liked = cur.fetchall()[0][0]
     CONN.commit()
     return str(liked)
@@ -291,7 +329,8 @@ def user_login(name,password):
 def format_space(st):
     if re.match(r'^\s+$',st):
         return 0
-    format_st = re.sub(r'\s+',r' ',st.strip())
+    st1 = re.sub(r'\r',r'<br/>',st)
+    format_st = re.sub(r'\s+',r' ',st1.strip())
     return format_st
 
 def validate_email(addr):
