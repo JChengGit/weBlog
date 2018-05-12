@@ -70,7 +70,7 @@ def update_post():
         username = userinfo[0]
         post_number = userinfo[1]
         email = userinfo[2]
-        cur.execute("SELECT id,content,create_at FROM posts WHERE user_id=%s",(current_id,))
+        cur.execute("SELECT id,content,create_at FROM posts WHERE user_id=%s ORDER BY create_at",(current_id,))
         posts = cur.fetchall()
         posts.reverse()
         return render_template('home.html',username=username,post_number=post_number,
