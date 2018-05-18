@@ -329,8 +329,7 @@ def user_login(name,password):
 def format_space(st):
     if re.match(r'^\s+$',st):
         return 0
-    st1 = re.sub(r'\r',r'<br/>',st)
-    format_st = re.sub(r'\s+',r' ',st1.strip())
+    format_st = re.sub(r'\s+',r' ',st.strip())
     return format_st
 
 def validate_email(addr):

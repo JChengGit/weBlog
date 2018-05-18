@@ -4,53 +4,50 @@ CREATE TABLE users (
 	email		text 	UNIQUE,
 	name		text	UNIQUE,
 	gender		text,
-	posts		int	DEFAULT 0,
-	followers	int	DEFAULT 0,
-	followings	int	DEFAULT 0
+	posts		int		DEFAULT 0,
+	followers	int		DEFAULT 0,
+	followings	int		DEFAULT 0
 );
 
 CREATE TABLE posts (
 	id			serial	PRIMARY KEY,
-	user_id		int	REFERENCES users,
-	repost_id	int	REFERENCES posts,
+	user_id		int		REFERENCES users	ON DELETE CASCADE,
 	content		text 	NOT NULL,
-	commented	int 	DEFAULT 0,
-	liked		int	DEFAULT 0,
+	liked		int		DEFAULT 0,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0)
 );
 
 CREATE TABLE comments (
 	id			serial	PRIMARY KEY,
-	user_id		int	REFERENCES users,
-	post_id		int	REFERENCES posts	 ON DELETE CASCADE,
-	comment_id	int	REFERENCES comments	 ON DELETE CASCADE,
+	user_id		int		REFERENCES users	ON DELETE CASCADE,
+	post_id		int		REFERENCES posts	ON DELETE CASCADE,
 	content		text	NOT NULL,
-	liked		int	DEFAULT 0,
+	liked		int		DEFAULT 0,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0)
 );
 
 CREATE TABLE follows (
-	user_id		int	REFERENCES users,
-	fan_id		int	REFERENCES users,
+	user_id		int		REFERENCES users,
+	fan_id		int		REFERENCES users,
 	UNIQUE(user_id,fan_id)
 );
 
 CREATE TABLE favorates (
-	user_id		int	REFERENCES users,
-	post_id		int	REFERENCES posts	 ON DELETE CASCADE,
+	user_id		int		REFERENCES users	ON DELETE CASCADE,
+	post_id		int		REFERENCES posts	ON DELETE CASCADE,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 	UNIQUE(user_id,post_id)
 );
 
 CREATE TABLE likeposts (
-	user_id		int	REFERENCES users,
-	post_id		int	REFERENCES posts	ON DELETE CASCADE,
+	user_id		int		REFERENCES users	ON DELETE CASCADE,
+	post_id		int		REFERENCES posts	ON DELETE CASCADE,
 	UNIQUE(user_id,post_id)
 );
 
 CREATE TABLE likecmts (
-	user_id		int	REFERENCES users,
-	comment_id	int	REFERENCES comments	ON DELETE CASCADE,
+	user_id		int		REFERENCES users	ON DELETE CASCADE,
+	comment_id	int		REFERENCES comments	ON DELETE CASCADE,
 	UNIQUE(user_id,comment_id)
 );
 
@@ -69,34 +66,6 @@ $post_table$ LANGUAGE plpgsql;
 
 CREATE TRIGGER posts_counter AFTER INSERT OR DELETE ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_count();
-
-
-
-
-CREATE FUNCTION comment_count() RETURNS TRIGGER AS $comments_table$
-	BEGIN
-		IF (TG_OP = 'INSERT') THEN
-			IF (new.post_id) THEN
-				UPDATE posts SET commented=commented+1 WHERE id=new.post_id;
-				RETURN NEW;
-			ELSIF (new.comment_id) THEN
-				UPDATE posts SET commented=commented+1 WHERE id=(SELECT post_id FROM comments WHERE comment_id=new.comment_id);
-				RETURN NEW;
-			END IF;
-		ELSIF (TG_OP = 'DELETE') THEN
-			IF (new.post_id) THEN
-				UPDATE posts SET commented=commented-1 WHERE id=new.post_id;
-				RETURN NEW;
-			ELSIF (new.comment_id) THEN
-				UPDATE posts SET commented=commented-1 WHERE id=(SELECT post_id FROM comments WHERE comment_id=new.comment_id);
-				RETURN NEW;
-			END IF;
-		END IF;
-	END;
-$comments_table$ LANGUAGE plpgsql;
-
-CREATE TRIGGER comment_counter AFTER INSERT OR DELETE ON comments
-FOR EACH ROW EXECUTE PROCEDURE comment_count();
 
 
 
