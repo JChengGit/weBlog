@@ -9,48 +9,174 @@
 function like_post(post_id)
 {
     var xmlhttp;
-    var url = "/community/like?post_id="+post_id;
+    var url = "/post/like?post_id="+post_id;
     xmlhttp=new XMLHttpRequest();
     xmlhttp.onreadystatechange=function()
     {
         if (xmlhttp.readyState==4 && xmlhttp.status==200)
         {
-            document.getElementById("like_counter"+post_id).innerHTML=xmlhttp.responseText;
+            document.getElementById("likepost_counter"+post_id).innerHTML=xmlhttp.responseText;
         }
     }
     xmlhttp.open("GET",url,true);
     xmlhttp.send();
 }
+
+function like_cmt(comment_id)
+{
+    var xmlhttp;
+    var url = "/comment/like?comment_id="+comment_id;
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.onreadystatechange=function()
+    {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        {
+            document.getElementById("likecmt_counter"+comment_id).innerHTML=xmlhttp.responseText;
+        }
+    }
+    xmlhttp.open("GET",url,true);
+    xmlhttp.send();
+}
+
+function update(id){
+    var content_id = 'current_post'+id
+    var content = document.getElementById(content_id).innerText
+    document.getElementById('post'+id).innerHTML="\
+    <div class='postlist' style='width:810px;padding:30px 20px 20px 20px'>\
+        <form action='/post/update' method='post'>\
+            <input type='hidden' name='post_id' value='"+id+"'>\
+            <textarea rows=3 name='uptxt' style='margin:0px 0px'>"+content+"</textarea>\
+            <button style='font-size:15px;margin:10px 0px 0px 710px' type='submit'>Update</button>\
+        </form>\
+    </div>"
+}
+
+function update_cmt(id){
+    var content_id = 'current_cmt'+id
+    var content = document.getElementById(content_id).innerText
+    document.getElementById('cmt'+id).innerHTML="\
+    <div style='padding:10px;'>\
+        <form action='/comment/update' method='post'>\
+            <input type='hidden' name='comment_id' value='"+id+"'>\
+            <textarea rows=3 name='upcmt' style='margin:0px 0px;width:725px;'>"+content+"</textarea>\
+            <button style='font-size:15px;margin:10px 0px 0px 630px;' type='submit'>Update</button>\
+        </form>\
+    </div>"
+}
+
+function comment(id){
+    var comment_area = 'comment_area'+id
+    document.getElementById(comment_area).innerHTML="\
+    <form action='/comment' method='post'>\
+        <input type='hidden' name='post_id' value='"+id+"'>\
+        <textarea rows=2 name='content' style='margin:0px 0px;width:765px;'></textarea>\
+        <button style='font-size:15px;margin:10px 0px 0px 670px' type='submit'>Comment</button>\
+    </form>"
+}
+
 </script>
 </head>
 <body>
 
 
+
+
+
 <ul>
     <li style="margin-left:160px"><a class="active" href="/community">Community</a></li>
-    <li><a href="/home">Home</a></li>
     <li><a href="/find">Find</a></li>
     <li><a href="/follow">Follow</a></li>
-    <li><a href="/favorates">Favorates</a></li>
     <li><a href="/setting">Setting</a></li>
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
 
 <div style="display: -webkit-box;">
 
-<div style="margin-top: 150px;">
+<div>
+
+    <div class="post" style="height: 240px;">
+        <form action="/post" method="post">
+            <h3 style="margin-left: 20px;padding-top: 20px;">Write your post.</h3>
+            <textarea rows=5  wrap="hard" name="content"></textarea>
+            <button style="float: right; margin: 5px 18px 10px 0px;" type="submit">Post</button>
+        </form>
+    </div>
+
+    <div>
+        {% if p_message %}
+        <p style="margin:5px 0px 20px 270px; width:500px;float:left;color:red;font-size:18px">{{p_message}}</p>
+        {% endif %}
+    </div><br>
 
     {% for i in postlist %}
-    <div class="postlist">
-        <h4>{{i[0]}}</h4>
-        <p>{{i[2]}}</p>
-        <div style="display: -webkit-box">
-            <p id="like_counter{{i[1]}}" style="font-size:16px;padding-left:530px">{{i[3]}} </p>
-            <p onclick="like_post({{i[1]}})" style="font-size:16px;padding-left:6px;cursor:pointer">like</p>
-            <p style="font-size:16px;padding-left:30px">{{i[4]}}</p>
+    <div id="post{{i[2]}}">
+        <div class="postlist">
+            <h4 style="font-size: 25px;">{{i[0]}}</h4>
+            <p id="current_post{{i[2]}}">{{i[3]}}</p>
+            <div style="display: -webkit-box;">
+                <p style="font-size:16px;">{{i[5]}}</p>
+                <p onclick="comment({{i[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;">comment</p>
+                <p id="likepost_counter{{i[2]}}" style="font-size:16px;padding-left:15px;">{{i[4]}} </p>
+                <p onclick="like_post({{i[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;">like</p>
+                <p style="font-size:16px;padding-left:30px">{{i[6]}}</p>
+                <script>
+                    if ({{i[1]}} == {{current_id}})
+                    {document.write("\
+                    <div>\
+                        <button onclick='update({{i[2]}})' style='margin-left: 30px;font-size:15px;margin-top: 13px;'>Update</button>\
+                    </div>\
+                    <div id='delete_button'>\
+                        <form action='/post/delete' method='post'>\
+                            <input type='hidden' name='post_id' value='{{i[2]}}'>\
+                            <button style='font-size:15px;margin-left: 30px;margin-top: 13px;background-color: red'>Delete</button>\
+                        </form>\
+                    </div>");
+                    }
+                </script>
+            </div>
+            <div id="comment_area{{i[2]}}"></div>
+            {% if i[7] %}
+            <div style="margin: 8px;background-color: #DDDDDD;">
+            <h4 style="padding-top:5px;padding-left:10px;">Comments</h4>
+            <hr>
+            {% for c in i[7] %}
+            <div id="cmt{{c[2]}}">
+                <div style="display: --webkit-box;">
+                    <label style="margin-left: 15px;font-size: 20px;font-weight: bold;">{{c[1]}}:&nbsp;&nbsp;&nbsp; </label>
+                    <label id="current_cmt{{c[2]}}">{{c[3]}}</label>
+                </div>
+                <div style="display: -webkit-box;">
+                    <p id="likecmt_counter{{c[2]}}" style="font-size:16px;padding-left:15px;">{{c[4]}} </p>
+                    <p onclick="like_cmt({{c[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;">like</p>
+                    <p style="float: right;font-size:16px;padding-left:50px;">{{c[5]}}</p>
+                    <script>
+                        if ({{c[0]}} == {{current_id}}) {
+                            document.write("\
+                            <div>\
+                                <button onclick='update_cmt({{c[2]}})' style='margin-left: 30px;margin-top:15px; font-size:12px;padding:6px;width:70px;'>Update</button>\
+                            </div>");
+                        }
+                        if (({{i[1]}} == {{current_id}}) || ({{c[0]}} == {{current_id}})){
+                            document.write("\
+                            <div id='delete_button'>\
+                                <form action='/comment/delete' method='post'>\
+                                    <input type='hidden' name='comment_id' value='{{c[2]}}'>\
+                                    <button style='font-size:12px;margin-left: 30px;margin-top:15px; background-color: red;padding:6px;width:70px;'>Delete</button>\
+                                </form>\
+                            </div>");
+                        }
+                    </script>
+                </div>
+                <hr>
+            </div>
+            {% endfor %}
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
+
+
 </div>
 
 
@@ -58,6 +184,7 @@ function like_post(post_id)
 <div class="card">
     <h2 style="margin-left: 30px">{{userinfo[0]}}</h2>
     <h4 style="margin-left: 30px">{{userinfo[1]}}</h4>
+    <h4 style="margin-left: 30px">{{userinfo[2]}} posts</h4>
     
 </div>
 

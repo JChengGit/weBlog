@@ -9,20 +9,18 @@
 
 <ul>
     <li style="margin-left:160px"><a href="/community">Community</a></li>
-    <li><a href="/home">Home</a></li>
     <li><a href="/find">Find</a></li>
     <li><a href="/follow">Follow</a></li>
-    <li><a href="/favorates">Favorates</a></li>
     <li><a class="active" href="/setting">Setting</a></li>
     <li style="float:right;background-color:#606060"><a href="/logout">LogOut</a></li>
 </ul>
 
 <div style="margin-left:200px;margin-top:100px;">
-    <h1 style="padding-bottom: 50px">Setting.</h1>
+    <h2>Setting</h2>
 
 	<form action="/setting" method="post">
 	    <div>
-	        <h3>Change your password:</h3>
+	        <p>Change your password:</p>
 	        <input style="height: 28px; margin-bottom: 1px;"  type="password" name="password" placeholder="New password" required="required"/><br>
 	        <input style="height: 28px; margin-bottom: 1px;"  type="password" name="password2" placeholder="New password again" required="required"/>
 	        <button type="submit" style="width:90px;background-color:#4CAF50;border:none;border-radius:4px;color:white;font-size:16px;padding:8px;">Reset</button> 
@@ -32,9 +30,19 @@
 	        {% endif %}
 	    </div>
 	</form>
-
-
 </div>  
+
+<div style="margin-left:200px;margin-top:100px;">
+	<h2>Cancellation of registry</h2>
+	<form action="/setting/cancellation" method="post">
+		<p>Warning: this operation will delete your account.</p>
+		<input style="height: 28px; margin-bottom: 1px;" type="password" name="password" placeholder="Password" required="required">
+		<button type="submit" style="width:90px;background-color: red;margin-left: 5px;font-size:16px;padding:8px;">DELETE</button>
+	</form>
+	{% if message2 %}
+    <p style="color:red">&nbsp;&nbsp;{{message2}}</p>
+    {% endif %}
+</div>
 
 </body>
 </html>

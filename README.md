@@ -42,6 +42,14 @@ follow、unfollow功能及其计数；<br>
 <br>
 5.18更新<br>
 数据库更新，关联删除。<br>
+5.19更新<br>
+community与home页面合并<br>
+评论的发表，计数，点赞，取消赞，赞计数；<br>
+评论的删除、更新，及其权限判断；<br>
+post和user的关联删除；<br>
+注销帐号。<br>
+<br>
+
 
 </p>
 

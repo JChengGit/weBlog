@@ -14,6 +14,7 @@ CREATE TABLE posts (
 	user_id		int		REFERENCES users	ON DELETE CASCADE,
 	content		text 	NOT NULL,
 	liked		int		DEFAULT 0,
+	commented	int 	DEFAULT 0,
 	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0)
 );
 
@@ -27,8 +28,8 @@ CREATE TABLE comments (
 );
 
 CREATE TABLE follows (
-	user_id		int		REFERENCES users,
-	fan_id		int		REFERENCES users,
+	user_id		int		REFERENCES users	ON DELETE CASCADE,
+	fan_id		int		REFERENCES users	ON DELETE CASCADE,
 	UNIQUE(user_id,fan_id)
 );
 
@@ -66,6 +67,24 @@ $post_table$ LANGUAGE plpgsql;
 
 CREATE TRIGGER posts_counter AFTER INSERT OR DELETE ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_count();
+
+
+
+
+CREATE FUNCTION cmt_count() RETURNS TRIGGER AS $comments_table$
+	BEGIN
+		IF (TG_OP = 'INSERT') THEN
+			UPDATE posts SET commented=commented+1 WHERE id=new.post_id;
+			RETURN NEW;
+		ELSIF (TG_OP = 'DELETE') THEN
+			UPDATE posts SET commented=commented-1 WHERE id=old.post_id;
+			RETURN NEW;
+		END IF;
+	END;
+$comments_table$ LANGUAGE plpgsql;
+
+CREATE TRIGGER cmt_counter AFTER INSERT OR DELETE ON comments
+FOR EACH ROW EXECUTE PROCEDURE cmt_count();
 
 
 
