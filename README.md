@@ -49,15 +49,6 @@ community与home页面合并<br>
 post和user的关联删除；<br>
 注销帐号。<br>
 <br>
-
-
-</p>
-
-
-
-
-
-
-
-
+5.21更新<br>
+修复当没有关注关系时不显示post的bug。<br>
 
