@@ -23,9 +23,11 @@ def view():
     if p_message == "cf":
         p_message = "Comment failed, please type in something."
     cur = CONN.cursor()
-    cur.execute("SELECT DISTINCT(u.name),u.id,p.id,p.content,p.liked,p.commented,p.create_at \
+    cur.execute("SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
         FROM users u, posts p, follows f \
-        WHERE ((f.fan_id=%s AND u.id=f.user_id) OR u.id=%s) AND p.user_id=u.id \
+        WHERE f.fan_id=%s AND u.id=f.user_id AND p.user_id=u.id \
+        UNION SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
+        FROM users u, posts p WHERE u.id=%s AND p.user_id=u.id \
         ORDER BY create_at;",(current_id,current_id))
     postlist_t = cur.fetchall()
     postlist_t.reverse()

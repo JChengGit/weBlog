@@ -23,9 +23,11 @@ def view():
     if p_message == "cf":
         p_message = "Comment failed, please type in something."
     cur = CONN.cursor()
-    cur.execute("SELECT DISTINCT(u.name),u.id,p.id,p.content,p.liked,p.commented,p.create_at \
+    cur.execute("SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
         FROM users u, posts p, follows f \
-        WHERE ((f.fan_id=%s AND u.id=f.user_id) OR u.id=%s) AND p.user_id=u.id \
+        WHERE f.fan_id=%s AND u.id=f.user_id AND p.user_id=u.id \
+        UNION SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
+        FROM users u, posts p WHERE u.id=%s AND p.user_id=u.id \
         ORDER BY create_at;",(current_id,current_id))
     postlist_t = cur.fetchall()
     postlist_t.reverse()
@@ -178,7 +180,7 @@ def register():
     if result == 'wrongPWD':
         return render_template('register.html',message='Please type in same passwords.')
     if result == 'wrongType':
-    	return render_template('register.html',message="Only letters or numbers are allowed to be password.")
+        return render_template('register.html',message="Only letters or numbers are allowed to be password.")
     if result == "users_name_key":
         return render_template('register.html',message="Username has already existed.")
     if result == "users_email_key":
@@ -208,8 +210,8 @@ def reset():
     if password2 != password:
         return render_template('setting.html',pwd="Please type in same passwords.")
     if not(re.match(r'^[a-zA-Z0-9]+$',password)):
-    	return render_template('setting.html',
-    		pwd="Only letters or numbers are allowed.") 
+        return render_template('setting.html',
+            pwd="Only letters or numbers are allowed.") 
     if password_hash == originPWD:
         return render_template('setting.html',pwd="Same as previous password.")
     cur.execute("UPDATE users SET password=%s WHERE id=%s",(password,int(current_id)))
@@ -306,7 +308,7 @@ def create_user(email, name, password, password2, gender):
     if password != password2:
         return 'wrongPWD'
     if not(re.match(r'^[a-zA-Z0-9]+$',password)):
-    	return 'wrongType'
+        return 'wrongType'
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
     cur = CONN.cursor()
     data = [email.lower(),name,password_hash,gender]
@@ -323,7 +325,7 @@ def user_login(name,password):
     name_f = format_space(name)
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
     if name_f == 0:
-    	return "space"
+        return "space"
     if validate_email(name_f)==1:
         cur.execute("SELECT password,id FROM users WHERE email=%s",(name_f.lower(),))
     else:
