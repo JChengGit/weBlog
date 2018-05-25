@@ -214,7 +214,7 @@ def reset():
             pwd="Only letters or numbers are allowed.") 
     if password_hash == originPWD:
         return render_template('setting.html',pwd="Same as previous password.")
-    cur.execute("UPDATE users SET password=%s WHERE id=%s",(password,int(current_id)))
+    cur.execute("UPDATE users SET password=%s WHERE id=%s",(password_hash,int(current_id)))
     CONN.commit()
     return render_template('setting.html',pwd="You have changed your password.")
 @app.route('/setting/cancellation',methods=['POST'])

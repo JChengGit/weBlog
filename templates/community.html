@@ -115,9 +115,9 @@ function comment(id){
             <p id="current_post{{i[2]}}">{{i[3]}}</p>
             <div style="display: -webkit-box;">
                 <p style="font-size:16px;">{{i[5]}}</p>
-                <p onclick="comment({{i[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;">comment</p>
+                <p onclick="comment({{i[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;color:green;">Comment</p>
                 <p id="likepost_counter{{i[2]}}" style="font-size:16px;padding-left:15px;">{{i[4]}} </p>
-                <p onclick="like_post({{i[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;">like</p>
+                <p onclick="like_post({{i[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;color:green;">Like</p>
                 <p style="font-size:16px;padding-left:30px">{{i[6]}}</p>
                 <script>
                     if ({{i[1]}} == {{current_id}})
@@ -147,7 +147,7 @@ function comment(id){
                 </div>
                 <div style="display: -webkit-box;">
                     <p id="likecmt_counter{{c[2]}}" style="font-size:16px;padding-left:15px;">{{c[4]}} </p>
-                    <p onclick="like_cmt({{c[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;">like</p>
+                    <p onclick="like_cmt({{c[2]}})" style="font-size:16px;padding-left:6px;cursor:pointer;text-decoration: underline;color:green; ">like</p>
                     <p style="float: right;font-size:16px;padding-left:50px;">{{c[5]}}</p>
                     <script>
                         if ({{c[0]}} == {{current_id}}) {
