@@ -225,12 +225,12 @@ def cancellation():
     password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
     cur.execute("SELECT password FROM users WHERE id=%s",(current_id,))
     pwd = cur.fetchall()[0][0]
-    print(pwd)
     if password_hash == pwd:
         cur.execute("DELETE FROM users WHERE id=%s",(current_id,))
         CONN.commit()
         return redirect('/login')
     else:
+        CONN.commit()
         return redirect('/setting?ms=wp')
 
 
