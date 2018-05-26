@@ -33,13 +33,6 @@ CREATE TABLE follows (
 	UNIQUE(user_id,fan_id)
 );
 
-CREATE TABLE favorates (
-	user_id		int		REFERENCES users	ON DELETE CASCADE,
-	post_id		int		REFERENCES posts	ON DELETE CASCADE,
-	create_at	timestamp	NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-	UNIQUE(user_id,post_id)
-);
-
 CREATE TABLE likeposts (
 	user_id		int		REFERENCES users	ON DELETE CASCADE,
 	post_id		int		REFERENCES posts	ON DELETE CASCADE,

@@ -5,6 +5,7 @@ CONN = None
 app = Flask(__name__)
 app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x81'
 
+
 @app.route('/')
 def index():
     return redirect('/login')
@@ -125,6 +126,10 @@ def login():
     else:
         session['current'] = result
         return redirect('/community')
+@app.route('/logout',methods=['GET'])
+def logout():
+    session.pop('current',None)
+    return redirect('/login')
 
 
 @app.route('/register',methods=['GET'])
@@ -238,19 +243,6 @@ def unfollow():
     data = [user_id,current_id]
     cur.execute("DELETE FROM follows WHERE user_id=%s AND fan_id=%s",data)
     return redirect('/follow')
-
-
-@app.route('/favorates')
-def favorates():
-    if 'current' not in session:
-        return redirect('/login')
-    return render_template('favorates.html')
-
-
-@app.route('/logout',methods=['GET'])
-def logout():
-    session.pop('current',None)
-    return redirect('/login')
 
 
 def create_user(email, name, password, password2, gender):

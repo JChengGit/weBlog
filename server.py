@@ -5,6 +5,7 @@ CONN = None
 app = Flask(__name__)
 app.secret_key = b'\xa5`k\xe8H2/\xdf\x17\x18r1\xb1\xd2jB\xf4\x86\xa3.\x02g\x94\x81'
 
+
 @app.route('/')
 def index():
     return redirect('/login')
@@ -49,40 +50,24 @@ def view():
 
 @app.route('/post',methods=['POST'])
 def post():
-    cur = CONN.cursor()
     current_id = session['current']
-    content = format_space(request.form['content'])
-    if (content == 0) or (content == ""):
+    content = request.form['content']
+    result = create_post(current_id,content)
+    if result == 'post failed':
         return redirect('/community?ms=pf')
-    data = (current_id,content)
-    cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
-    CONN.commit()
     return redirect('/community')
 @app.route('/post/like',methods=['GET'])
-def like_post():
-    cur = CONN.cursor()
+def likepost():
     current_id = session['current']
     post_id = int(request.args.get('post_id'))
-    data = [current_id,post_id]
-    cur.execute("SELECT * FROM likeposts WHERE user_id=%s AND post_id=%s",data)
-    if len(cur.fetchall())==0:
-        cur.execute("INSERT INTO likeposts values(%s,%s)",data)
-    else:
-        cur.execute("DELETE FROM likeposts WHERE user_id=%s AND post_id=%s",data)
-    cur.execute("SELECT liked FROM posts WHERE id=%s",(post_id,))
-    liked = cur.fetchall()[0][0]
-    CONN.commit()
-    return str(liked)
+    return like_post(current_id,post_id)
 @app.route('/post/update',methods=['POST'])
-def update_post():
-    cur = CONN.cursor()
+def updatepost():
     post_id = request.form['post_id']
-    content = format_space(request.form['uptxt'])
-    if (content == 0) or (content == ""):
+    content = request.form['uptxt']
+    result = update_post(post_id,content)
+    if result == 'update failed':
         return redirect('/community?ms=uf')
-    data = [content,post_id]
-    cur.execute("UPDATE posts SET content=%s WHERE id=%s",data)
-    CONN.commit()
     return redirect('/community')
 @app.route('/post/delete',methods=['POST'])
 def delete_post():
@@ -95,15 +80,25 @@ def delete_post():
 
 @app.route('/comment',methods=['POST'])
 def comment():
-    cur = CONN.cursor()
     current_id = session['current']
     post_id = request.form['post_id']
     content = format_space(request.form['content'])
-    if (content == 0) or (content == ""):
+    result = create_comment(current_id,post_id,content)
+    if result == "comment failed":
         return redirect('/community?ms=cf')
-    data = [current_id,post_id,content]
-    cur.execute("INSERT INTO comments(user_id,post_id,content) VALUES(%s,%s,%s)",data)
-    CONN.commit()
+    return redirect('/community')
+@app.route('/comment/like',methods=['GET'])
+def likecomment():
+    current_id = session['current']
+    comment_id = request.args.get('comment_id')
+    return like_comment(current_id,comment_id)
+@app.route('/comment/update',methods=['POST'])
+def updatecomment():
+    comment_id = request.form['comment_id']
+    content = request.form['upcmt']
+    result = update_comment(comment_id,content)
+    if result == 'update failed':
+        return redirect('/community?ms=uf')
     return redirect('/community')
 @app.route('/comment/delete',methods=['POST'])
 def delete_comment():
@@ -112,33 +107,6 @@ def delete_comment():
     cur.execute("DELETE FROM comments WHERE id=%s",(comment_id,))
     CONN.commit()
     return redirect('/community')
-@app.route('/comment/like',methods=['GET'])
-def like_comment():
-    cur = CONN.cursor()
-    current_id = session['current']
-    comment_id = request.args.get('comment_id')
-    data = [current_id,comment_id]
-    cur.execute("SELECT * FROM likecmts WHERE user_id=%s AND comment_id=%s",data)
-    if len(cur.fetchall())==0:
-        cur.execute("INSERT INTO likecmts values(%s,%s)",data)
-    else:
-        cur.execute("DELETE FROM likecmts WHERE user_id=%s AND comment_id=%s",data)
-    cur.execute("SELECT liked FROM comments WHERE id=%s",(comment_id,))
-    liked = cur.fetchall()[0][0]
-    CONN.commit()
-    return str(liked)
-@app.route('/comment/update',methods=['POST'])
-def update_comment():
-    cur = CONN.cursor()
-    comment_id = request.form['comment_id']
-    content = format_space(request.form['upcmt'])
-    if (content == 0) or (content == ""):
-        return redirect('/community?ms=uf')
-    data = [content,comment_id]
-    cur.execute("UPDATE comments SET content=%s WHERE id=%s",data)
-    CONN.commit()
-    return redirect('/community')
-
 
 
 @app.route('/login',methods=['GET'])
@@ -158,6 +126,10 @@ def login():
     else:
         session['current'] = result
         return redirect('/community')
+@app.route('/logout',methods=['GET'])
+def logout():
+    session.pop('current',None)
+    return redirect('/login')
 
 
 @app.route('/register',methods=['GET'])
@@ -199,38 +171,26 @@ def setting():
 @app.route('/setting',methods = ['POST'])
 def reset():
     current_id = session['current']
-    cur = CONN.cursor()
-    cur.execute("SELECT password FROM users WHERE id=%s",(current_id,))
-    originPWD = cur.fetchall()[0][0]
     password = request.form['password']
     password2 = request.form['password2']
-    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
-    if len(password) < 6:
+    result = change_password(current_id,password,password2)
+    if result == 'short':
         return render_template('setting.html',pwd="Password has to be at least 6 characters.")
-    if password2 != password:
+    if result == 'wrongPWD':
         return render_template('setting.html',pwd="Please type in same passwords.")
-    if not(re.match(r'^[a-zA-Z0-9]+$',password)):
-        return render_template('setting.html',
-            pwd="Only letters or numbers are allowed.") 
-    if password_hash == originPWD:
+    if result == 'notPWD':
+        return render_template('setting.html',pwd="Only letters or numbers are allowed.")
+    if result == 'samePWD':
         return render_template('setting.html',pwd="Same as previous password.")
-    cur.execute("UPDATE users SET password=%s WHERE id=%s",(password_hash,int(current_id)))
-    CONN.commit()
     return render_template('setting.html',pwd="You have changed your password.")
 @app.route('/setting/cancellation',methods=['POST'])
 def cancellation():
-    cur = CONN.cursor()
     current_id = session['current']
     password = request.form['password']
-    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
-    cur.execute("SELECT password FROM users WHERE id=%s",(current_id,))
-    pwd = cur.fetchall()[0][0]
-    if password_hash == pwd:
-        cur.execute("DELETE FROM users WHERE id=%s",(current_id,))
-        CONN.commit()
+    result = delete_user(current_id,password)
+    if result == 1:
         return redirect('/login')
     else:
-        CONN.commit()
         return redirect('/setting?ms=wp')
 
 
@@ -250,11 +210,15 @@ def find():
 def found():
     current_id = session['current']
     user_id = request.form['user_id']
+    follow_user(current_id,user_id)
+    return redirect('/find')
+
+
+def follow_user(current_id,user_id):
     cur = CONN.cursor()
     data = [user_id,current_id]
     cur.execute("INSERT INTO follows(user_id,fan_id) VALUES(%s,%s)",data)
     CONN.commit()
-    return redirect('/find')
 
 
 @app.route('/follow',methods=['GET'])
@@ -279,19 +243,6 @@ def unfollow():
     data = [user_id,current_id]
     cur.execute("DELETE FROM follows WHERE user_id=%s AND fan_id=%s",data)
     return redirect('/follow')
-
-
-@app.route('/favorates')
-def favorates():
-    if 'current' not in session:
-        return redirect('/login')
-    return render_template('favorates.html')
-
-
-@app.route('/logout',methods=['GET'])
-def logout():
-    session.pop('current',None)
-    return redirect('/login')
 
 
 def create_user(email, name, password, password2, gender):
@@ -320,6 +271,19 @@ def create_user(email, name, password, password2, gender):
         CONN.commit()
         return result
 
+def delete_user(current_id,password):
+    cur = CONN.cursor()
+    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    cur.execute("SELECT password FROM users WHERE id=%s",(current_id,))
+    pwd = cur.fetchall()[0][0]
+    if password_hash == pwd:
+        cur.execute("DELETE FROM users WHERE id=%s",(current_id,))
+        CONN.commit()
+        return 1
+    else:
+        CONN.commit()
+        return 'wrongPWD'
+
 def user_login(name,password):
     cur = CONN.cursor()
     name_f = format_space(name)
@@ -337,6 +301,90 @@ def user_login(name,password):
         return "wrongPWD"
     else:
         return info[0][1]
+
+def create_post(current_id,content):
+    content_f = format_space(content)
+    cur = CONN.cursor()
+    if (content_f == 0) or (content_f == ""):
+        CONN.commit()
+        return 'post failed'
+    data = (current_id,content_f)
+    cur.execute("INSERT INTO posts(user_id,content) values(%s,%s)",data)
+    CONN.commit()
+    return 1
+
+def like_post(current_id,post_id):
+    cur = CONN.cursor()
+    data = [current_id,post_id]
+    cur.execute("SELECT * FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    if len(cur.fetchall())==0:
+        cur.execute("INSERT INTO likeposts values(%s,%s)",data)
+    else:
+        cur.execute("DELETE FROM likeposts WHERE user_id=%s AND post_id=%s",data)
+    cur.execute("SELECT liked FROM posts WHERE id=%s",(post_id,))
+    liked = cur.fetchall()[0][0]
+    CONN.commit()
+    return str(liked)
+
+def update_post(post_id,content):
+    cur = CONN.cursor()
+    content_f = format_space(content)
+    if (content_f == 0) or (content_f == ""):
+        return 'update failed'
+    data = [content_f,post_id]
+    cur.execute("UPDATE posts SET content=%s WHERE id=%s",data)
+    CONN.commit()
+    return 1
+
+def create_comment(current_id,post_id,content):
+    cur = CONN.cursor()
+    content_f = format_space(content)
+    if (content_f == 0) or (content_f == ""):
+        return "comment failed"
+    data = [current_id,post_id,content_f]
+    cur.execute("INSERT INTO comments(user_id,post_id,content) VALUES(%s,%s,%s)",data)
+    CONN.commit()
+    return 1
+
+def  like_comment(current_id,comment_id):
+    cur = CONN.cursor()
+    data = [current_id,comment_id]
+    cur.execute("SELECT * FROM likecmts WHERE user_id=%s AND comment_id=%s",data)
+    if len(cur.fetchall())==0:
+        cur.execute("INSERT INTO likecmts values(%s,%s)",data)
+    else:
+        cur.execute("DELETE FROM likecmts WHERE user_id=%s AND comment_id=%s",data)
+    cur.execute("SELECT liked FROM comments WHERE id=%s",(comment_id,))
+    liked = cur.fetchall()[0][0]
+    CONN.commit()
+    return str(liked)
+
+def update_comment(comment_id,content):
+    cur = CONN.cursor()
+    content_f = format_space(content)
+    if (content_f == 0) or (content_f == ""):
+        return 'update failed'
+    data = [content_f,comment_id]
+    cur.execute("UPDATE comments SET content=%s WHERE id=%s",data)
+    CONN.commit()
+    return 1
+
+def change_password(current_id,password,password2):
+    cur = CONN.cursor()
+    cur.execute("SELECT password FROM users WHERE id=%s",(current_id,))
+    originPWD = cur.fetchall()[0][0]
+    password_hash = hashlib.md5(password.encode("utf-8")).hexdigest()
+    if len(password) < 6:
+        return 'short'
+    if password2 != password:
+        return 'wrongPWD'
+    if not(re.match(r'^[a-zA-Z0-9]+$',password)):
+        return 'notPWD'
+    if password_hash == originPWD:
+        return 'samePWD'
+    cur.execute("UPDATE users SET password=%s WHERE id=%s",(password_hash,int(current_id)))
+    CONN.commit()
+    return 1
 
 def format_space(st):
     if re.match(r'^\s+$',st):
