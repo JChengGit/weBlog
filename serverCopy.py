@@ -95,7 +95,7 @@ def likecomment():
 def updatecomment():
     comment_id = request.form['comment_id']
     content = request.form['upcmt']
-    result = update_post(comment_id,content)
+    result = update_comment(comment_id,content)
     if result == 'update failed':
         return redirect('/community?ms=uf')
     return redirect('/community')
