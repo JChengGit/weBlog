@@ -52,5 +52,5 @@ post和user的关联删除；<br>
 5.21更新<br>
 修复当没有关注关系时不显示post的bug。<br>
 5.26更新<br>
-扩写unittest内容，serverCopy.py大量修改，未同步到server.py<br>
+扩写unittest内容，server.py和serverCopy.py大量修改。<br>
 <br>
