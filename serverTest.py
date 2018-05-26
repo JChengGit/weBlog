@@ -16,6 +16,7 @@ class TestServer(unittest.TestCase):
         cur.execute("UPDATE posts SET id=1 WHERE user_id=1")
         create_comment(1,1,"test comment origin.")
         cur.execute("UPDATE comments SET id=1 WHERE user_id=1")
+        follow_user(1,3)
         CONN.commit()
 
     @classmethod
@@ -78,6 +79,17 @@ class TestServer(unittest.TestCase):
         CONN.commit()
         self.assertEqual(followers,1)
         self.assertEqual(followings,1)
+
+    def test_unfollow_user(self):
+        unfollow_user(1,3)
+        cur = CONN.cursor()
+        cur.execute("SELECT followers FROM users WHERE id=3")
+        followers = cur.fetchall()[0][0]
+        cur.execute("SELECT followings FROM users WHERE id=1")
+        followings = cur.fetchall()[0][0]
+        CONN.commit()
+        self.assertEqual(followers,0)
+        self.assertEqual(followings,0)
 
     def test_create_post(self):
         self.assertEqual(create_post(1,""),'post failed')

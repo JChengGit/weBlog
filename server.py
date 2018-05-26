@@ -23,13 +23,16 @@ def view():
         p_message = "Update failed, please type in your post."
     if p_message == "cf":
         p_message = "Comment failed, please type in something."
-    cur = CONN.cursor()
-    cur.execute("SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
-        FROM users u, posts p, follows f \
-        WHERE f.fan_id=%s AND u.id=f.user_id AND p.user_id=u.id \
-        UNION SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
-        FROM users u, posts p WHERE u.id=%s AND p.user_id=u.id \
-        ORDER BY create_at;",(current_id,current_id))
+    try:
+        cur = CONN.cursor()
+        cur.execute("SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
+            FROM users u, posts p, follows f \
+            WHERE f.fan_id=%s AND u.id=f.user_id AND p.user_id=u.id \
+            UNION SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
+            FROM users u, posts p WHERE u.id=%s AND p.user_id=u.id \
+            ORDER BY create_at;",(current_id,current_id))
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     postlist_t = cur.fetchall()
     postlist_t.reverse()
     postlist = []
@@ -52,7 +55,10 @@ def view():
 def post():
     current_id = session['current']
     content = request.form['content']
-    result = create_post(current_id,content)
+    try:
+        result = create_post(current_id,content)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     if result == 'post failed':
         return redirect('/community?ms=pf')
     return redirect('/community')
@@ -60,21 +66,30 @@ def post():
 def likepost():
     current_id = session['current']
     post_id = int(request.args.get('post_id'))
-    return like_post(current_id,post_id)
+    try:
+        return like_post(current_id,post_id)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
 @app.route('/post/update',methods=['POST'])
 def updatepost():
     post_id = request.form['post_id']
     content = request.form['uptxt']
-    result = update_post(post_id,content)
+    try:
+        result = update_post(post_id,content)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     if result == 'update failed':
         return redirect('/community?ms=uf')
     return redirect('/community')
 @app.route('/post/delete',methods=['POST'])
 def delete_post():
-    cur = CONN.cursor()
-    post_id = request.form['post_id']
-    cur.execute("DELETE FROM posts WHERE id=%s",(post_id,))
-    CONN.commit()
+    try:
+        cur = CONN.cursor()
+        post_id = request.form['post_id']
+        cur.execute("DELETE FROM posts WHERE id=%s",(post_id,))
+        CONN.commit()
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     return redirect('/community')
 
 
@@ -83,7 +98,10 @@ def comment():
     current_id = session['current']
     post_id = request.form['post_id']
     content = format_space(request.form['content'])
-    result = create_comment(current_id,post_id,content)
+    try:
+        result = create_comment(current_id,post_id,content)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     if result == "comment failed":
         return redirect('/community?ms=cf')
     return redirect('/community')
@@ -91,21 +109,30 @@ def comment():
 def likecomment():
     current_id = session['current']
     comment_id = request.args.get('comment_id')
-    return like_comment(current_id,comment_id)
+    try:
+        return like_comment(current_id,comment_id)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
 @app.route('/comment/update',methods=['POST'])
 def updatecomment():
     comment_id = request.form['comment_id']
     content = request.form['upcmt']
-    result = update_comment(comment_id,content)
+    try:
+        result = update_comment(comment_id,content)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     if result == 'update failed':
         return redirect('/community?ms=uf')
     return redirect('/community')
 @app.route('/comment/delete',methods=['POST'])
 def delete_comment():
-    cur = CONN.cursor()
-    comment_id = request.form['comment_id']
-    cur.execute("DELETE FROM comments WHERE id=%s",(comment_id,))
-    CONN.commit()
+    try:
+        cur = CONN.cursor()
+        comment_id = request.form['comment_id']
+        cur.execute("DELETE FROM comments WHERE id=%s",(comment_id,))
+        CONN.commit()
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     return redirect('/community')
 
 
@@ -173,7 +200,10 @@ def reset():
     current_id = session['current']
     password = request.form['password']
     password2 = request.form['password2']
-    result = change_password(current_id,password,password2)
+    try:
+        result = change_password(current_id,password,password2)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     if result == 'short':
         return render_template('setting.html',pwd="Password has to be at least 6 characters.")
     if result == 'wrongPWD':
@@ -187,7 +217,10 @@ def reset():
 def cancellation():
     current_id = session['current']
     password = request.form['password']
-    result = delete_user(current_id,password)
+    try:
+        result = delete_user(current_id,password)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     if result == 1:
         return redirect('/login')
     else:
@@ -199,49 +232,52 @@ def find():
     if 'current' not in session:
         return redirect('/login')
     current_id = session['current']
-    cur = CONN.cursor()
-    cur.execute("SELECT id,name,gender,email FROM users WHERE id!=%s \
-        AND id NOT IN (SELECT user_id FROM follows \
-        WHERE fan_id=%s)",(current_id,current_id))
-    data = cur.fetchall()
-    CONN.commit()
+    try:
+        cur = CONN.cursor()
+        cur.execute("SELECT id,name,gender,email FROM users WHERE id!=%s \
+            AND id NOT IN (SELECT user_id FROM follows \
+            WHERE fan_id=%s)",(current_id,current_id))
+        data = cur.fetchall()
+        CONN.commit()
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     return render_template('find.html',users=data)
 @app.route('/find',methods=['POST'])
 def found():
     current_id = session['current']
     user_id = request.form['user_id']
-    follow_user(current_id,user_id)
+    try:
+        follow_user(current_id,user_id)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     return redirect('/find')
-
-
-def follow_user(current_id,user_id):
-    cur = CONN.cursor()
-    data = [user_id,current_id]
-    cur.execute("INSERT INTO follows(user_id,fan_id) VALUES(%s,%s)",data)
-    CONN.commit()
 
 
 @app.route('/follow',methods=['GET'])
 def follow():
     if 'current' not in session:
         return redirect('/login')
-    cur = CONN.cursor()
-    current_id = session['current']
-    cur.execute("SELECT followings,followers FROM users WHERE id=%s",(current_id,))
-    count = cur.fetchall()[0]
-    cur.execute("SELECT id,name,gender,email FROM users WHERE id IN (SELECT user_id FROM follows WHERE fan_id=%s)",(current_id,))
-    followings = cur.fetchall()
-    cur.execute("SELECT id,name,gender,email FROM users WHERE id IN (SELECT fan_id FROM follows WHERE user_id=%s)",(current_id,))
-    followers = cur.fetchall()
-    CONN.commit()
+    try:
+        cur = CONN.cursor()
+        current_id = session['current']
+        cur.execute("SELECT followings,followers FROM users WHERE id=%s",(current_id,))
+        count = cur.fetchall()[0]
+        cur.execute("SELECT id,name,gender,email FROM users WHERE id IN (SELECT user_id FROM follows WHERE fan_id=%s)",(current_id,))
+        followings = cur.fetchall()
+        cur.execute("SELECT id,name,gender,email FROM users WHERE id IN (SELECT fan_id FROM follows WHERE user_id=%s)",(current_id,))
+        followers = cur.fetchall()
+        CONN.commit()
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     return render_template('follow.html',count=count,followings=followings,followers=followers)
 @app.route('/follow',methods=['POST'])
 def unfollow():
-    cur = CONN.cursor()
     current_id = session['current']
     user_id = request.form['user_id']
-    data = [user_id,current_id]
-    cur.execute("DELETE FROM follows WHERE user_id=%s AND fan_id=%s",data)
+    try:
+        unfollow_user(current_id,user_id)
+    except psycopg2.OperationalError as e:
+        return render_template('error.html')
     return redirect('/follow')
 
 
@@ -301,6 +337,18 @@ def user_login(name,password):
         return "wrongPWD"
     else:
         return info[0][1]
+
+def follow_user(current_id,user_id):
+    cur = CONN.cursor()
+    data = [user_id,current_id]
+    cur.execute("INSERT INTO follows(user_id,fan_id) VALUES(%s,%s)",data)
+    CONN.commit()
+
+def unfollow_user(current_id,user_id):
+    cur = CONN.cursor()
+    data = [user_id,current_id]
+    cur.execute("DELETE FROM follows WHERE user_id=%s AND fan_id=%s",data)
+    CONN.commit()
 
 def create_post(current_id,content):
     content_f = format_space(content)
