@@ -22,7 +22,7 @@ def view():
     if p_message == "uf":
         p_message = "Update failed, please type in your post."
     if p_message == "cf":
-        p_message = "Comment failed, please type in something."
+        p_message = "Update failed, please type in your comment."
     try:
         cur = CONN.cursor()
         cur.execute("SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
@@ -32,6 +32,8 @@ def view():
             FROM users u, posts p WHERE u.id=%s AND p.user_id=u.id \
             ORDER BY create_at;",(current_id,current_id))
     except psycopg2.OperationalError as e:
+        return render_template('error.html')
+    except psycopg2.InterfaceError as e:
         return render_template('error.html')
     postlist_t = cur.fetchall()
     postlist_t.reverse()
@@ -43,6 +45,7 @@ def view():
             FROM users u, comments c WHERE c.post_id=%s AND u.id=c.user_id \
             ORDER BY create_at;",(post_id,))
         comments = cur.fetchall()
+        comments.reverse()
         post.append(comments)
         postlist.append(post)
     cur.execute("SELECT name,email,posts FROM users WHERE id=%s",(current_id,))
@@ -59,6 +62,8 @@ def post():
         result = create_post(current_id,content)
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     if result == 'post failed':
         return redirect('/community?ms=pf')
     return redirect('/community')
@@ -70,6 +75,8 @@ def likepost():
         return like_post(current_id,post_id)
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
 @app.route('/post/update',methods=['POST'])
 def updatepost():
     post_id = request.form['post_id']
@@ -77,6 +84,8 @@ def updatepost():
     try:
         result = update_post(post_id,content)
     except psycopg2.OperationalError as e:
+        return render_template('error.html')
+    except psycopg2.InterfaceError as e:
         return render_template('error.html')
     if result == 'update failed':
         return redirect('/community?ms=uf')
@@ -90,6 +99,8 @@ def delete_post():
         CONN.commit()
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     return redirect('/community')
 
 
@@ -102,6 +113,8 @@ def comment():
         result = create_comment(current_id,post_id,content)
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     if result == "comment failed":
         return redirect('/community?ms=cf')
     return redirect('/community')
@@ -113,6 +126,8 @@ def likecomment():
         return like_comment(current_id,comment_id)
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
 @app.route('/comment/update',methods=['POST'])
 def updatecomment():
     comment_id = request.form['comment_id']
@@ -121,8 +136,10 @@ def updatecomment():
         result = update_comment(comment_id,content)
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     if result == 'update failed':
-        return redirect('/community?ms=uf')
+        return redirect('/community?ms=cf')
     return redirect('/community')
 @app.route('/comment/delete',methods=['POST'])
 def delete_comment():
@@ -132,6 +149,8 @@ def delete_comment():
         cur.execute("DELETE FROM comments WHERE id=%s",(comment_id,))
         CONN.commit()
     except psycopg2.OperationalError as e:
+        return render_template('error.html')
+    except psycopg2.InterfaceError as e:
         return render_template('error.html')
     return redirect('/community')
 
@@ -204,6 +223,8 @@ def reset():
         result = change_password(current_id,password,password2)
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     if result == 'short':
         return render_template('setting.html',pwd="Password has to be at least 6 characters.")
     if result == 'wrongPWD':
@@ -220,6 +241,8 @@ def cancellation():
     try:
         result = delete_user(current_id,password)
     except psycopg2.OperationalError as e:
+        return render_template('error.html')
+    except psycopg2.InterfaceError as e:
         return render_template('error.html')
     if result == 1:
         return redirect('/login')
@@ -241,6 +264,8 @@ def find():
         CONN.commit()
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     return render_template('find.html',users=data)
 @app.route('/find',methods=['POST'])
 def found():
@@ -249,6 +274,8 @@ def found():
     try:
         follow_user(current_id,user_id)
     except psycopg2.OperationalError as e:
+        return render_template('error.html')
+    except psycopg2.InterfaceError as e:
         return render_template('error.html')
     return redirect('/find')
 
@@ -269,6 +296,8 @@ def follow():
         CONN.commit()
     except psycopg2.OperationalError as e:
         return render_template('error.html')
+    except psycopg2.InterfaceError as e:
+        return render_template('error.html')
     return render_template('follow.html',count=count,followings=followings,followers=followers)
 @app.route('/follow',methods=['POST'])
 def unfollow():
@@ -277,6 +306,8 @@ def unfollow():
     try:
         unfollow_user(current_id,user_id)
     except psycopg2.OperationalError as e:
+        return render_template('error.html')
+    except psycopg2.InterfaceError as e:
         return render_template('error.html')
     return redirect('/follow')
 

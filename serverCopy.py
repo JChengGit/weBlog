@@ -22,7 +22,7 @@ def view():
     if p_message == "uf":
         p_message = "Update failed, please type in your post."
     if p_message == "cf":
-        p_message = "Comment failed, please type in something."
+        p_message = "Update failed, please type in your comment."
     try:
         cur = CONN.cursor()
         cur.execute("SELECT u.name,u.id,p.id,p.content,p.liked,p.commented,p.create_at \
@@ -43,6 +43,7 @@ def view():
             FROM users u, comments c WHERE c.post_id=%s AND u.id=c.user_id \
             ORDER BY create_at;",(post_id,))
         comments = cur.fetchall()
+        comments.reverse()
         post.append(comments)
         postlist.append(post)
     cur.execute("SELECT name,email,posts FROM users WHERE id=%s",(current_id,))
@@ -122,7 +123,7 @@ def updatecomment():
     except psycopg2.OperationalError as e:
         return render_template('error.html')
     if result == 'update failed':
-        return redirect('/community?ms=uf')
+        return redirect('/community?ms=cf')
     return redirect('/community')
 @app.route('/comment/delete',methods=['POST'])
 def delete_comment():
