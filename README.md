@@ -1,32 +1,31 @@
 <h3>1. How to install and run</h3>
 
-1) create database:
-		createdb weibo
-		psql weibo
-		\i tables.sql
-2) run
-	unzip the source code and:
-		pip install –r requirements.txt
-		python server.py
-	OR use docker:
-		docker build –t weibo .
-		docker run –net==host weibo 
-	Open the link 127.0.0.1:5000 to visit
+1) create database:<br>
+		createdb weibo<br>
+		psql weibo<br>
+		\i tables.sql<br>
+2) run<br>
+	unzip the source code and:<br>
+		pip install –r requirements.txt<br>
+		python server.py<br>
+	OR use docker:<br>
+		docker build –t weibo .<br>
+		docker run –net==host weibo <br>
+	Open the link 127.0.0.1:5000 to visit<br>
 
 
 <h3>2. Source Code Document</h3>
+1) Date base<br>
+	Connect the database through python psycopg<br>
+	Keep the sql lines in tables.sql，quick to create database<br>
+	Using the trigger to count number of posts,comments,likes etc. and deal with associate deleting<br>
+	database structure is displayed in schema.jpg<br>
 
-1) Date base
-	Connect the database through python psycopg
-	Keep the sql lines in tables.sql，quick to create database
-	Using the trigger to count number of posts,comments,likes etc. and deal with associate deleting
-	database structure is displayed in schema.jpg
-
-2) About server.py
-	/register  			for registration
-	Call create_user() to register via e-mail and username
-	Call validate_email() to verify if the e-mail is legal
-	Using MD5 hash the users’ password.
+2) About server.py<br>
+	/register  			for registration<br>
+	Call create_user() to register via e-mail and username<br>
+	Call validate_email() to verify if the e-mail is legal<br>
+	Using MD5 hash the users’ password.<br>
 
 	/login  			for login
 	Call user_login() to login
@@ -49,21 +48,21 @@
 	/comment/update 	for update the comment info in db
 	/comment/delete 	for delete the comment info in db
 
-3) UI
-	Design the webpage by using HTML/CSS/JavaScript
-	Using AJAX to implement the interact of like action
-	Display the webpage via flask framework render_template()
-	HTML files placed in templates/
-	CSS files placed in static/
+3) UI<br>
+	Design the webpage by using HTML/CSS/JavaScript<br>
+	Using AJAX to implement the interact of like action<br>
+	Display the webpage via flask framework render_template()<br>
+	HTML files placed in templates/<br>
+	CSS files placed in static/<br>
 
-4) Unittest
-	serverCopy.py is the copy of the server.py, but serverCopy.py connect to testdb.
-	to do the unittest :
-		createdb testdb
-		psql testdb
-		\i tables.sql
-		\q
-		python serverTest.py
+4) Unittest<br>
+	serverCopy.py is the copy of the server.py, but serverCopy.py connect to testdb.<br>
+	to do the unittest :<br>
+		createdb testdb<br>
+		psql testdb<br>
+		\i tables.sql<br>
+		\q<br>
+		python serverTest.py<br>
 
 
 
