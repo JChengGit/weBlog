@@ -15,13 +15,13 @@
 <br>
 
 <h3>2. Source Code Document</h3>
-<br>
+
 1) Date base<br>
 	Connect the database through python psycopg<br>
 	Keep the sql lines in tables.sql，quick to create database<br>
 	Using the trigger to count number of posts,comments,likes etc. and deal with associate deleting<br>
 	database structure is displayed in schema.jpg<br>
-<br>
+
 2) About server.py<br>
 	/register  			for registration<br>
 	Call create_user() to register via e-mail and username<br>
@@ -50,14 +50,14 @@
 	/comment/update 	for update the comment info in db<br>
 	/comment/delete 	for delete the comment info in db<br>
 </p>
-<br>
+
 3) UI<br>
 	Design the webpage by using HTML/CSS/JavaScript<br>
 	Using AJAX to implement the interact of like action<br>
 	Display the webpage via flask framework render_template()<br>
 	HTML files placed in templates/<br>
 	CSS files placed in static/<br>
-<br>
+
 4) Unittest<br>
 	serverCopy.py is the copy of the server.py, but serverCopy.py connect to testdb.<br>
 	to do the unittest :<br>
