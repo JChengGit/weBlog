@@ -65,7 +65,7 @@
 		\q<br>
 		python serverTest.py<br>
 
-
+<br><br>
 
 <h2>进度</h2>
 在127.0.0.1:5000中运行，会自动转到注册界面；<br>
