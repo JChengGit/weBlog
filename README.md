@@ -1,5 +1,4 @@
 <h3>1. How to install and run</h3>
-<hr>
 1) create database:<br>
 		&nbsp;createdb weibo<br>
 		&nbsp;psql weibo<br>
@@ -15,7 +14,6 @@
 <br>
 
 <h3>2. Source Code Document</h3>
-<hr>
 1) Date base<br>
 	Connect the database through python psycopg<br>
 	Keep the sql lines in tables.sql，quick to create database<br>
@@ -26,7 +24,7 @@
 	/register  			for registration<br>
 	Call create_user() to register via e-mail and username<br>
 	Call validate_email() to verify if the e-mail is legal<br>
-	Using MD5 hash the users’ password.<br>
+	Using MD5 hash the users’ password.
 <br>
 	/login  			for login<br>
 	Call user_login() to login<br>
