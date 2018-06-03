@@ -1,21 +1,21 @@
 <h3>1. How to install and run</h3>
-
+<hr>
 1) create database:<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;createdb weibo<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;psql weibo<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;\i tables.sql<br>
+		&nbsp;createdb weibo<br>
+		&nbsp;psql weibo<br>
+		&nbsp;\i tables.sql<br>
 2) run<br>
 	unzip the source code and:<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;pip install –r requirements.txt<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;python server.py<br>
+		&nbsp;pip install –r requirements.txt<br>
+		&nbsp;python server.py<br>
 	OR use docker:<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;docker build –t weibo .<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;docker run –net==host weibo <br>
+		&nbsp;docker build –t weibo .<br>
+		&nbsp;docker run –net==host weibo <br>
 	Open the link 127.0.0.1:5000 to visit<br>
 <br>
 
 <h3>2. Source Code Document</h3>
-
+<hr>
 1) Date base<br>
 	Connect the database through python psycopg<br>
 	Keep the sql lines in tables.sql，quick to create database<br>
@@ -27,8 +27,7 @@
 	Call create_user() to register via e-mail and username<br>
 	Call validate_email() to verify if the e-mail is legal<br>
 	Using MD5 hash the users’ password.<br>
-
-<p></p>
+<br>
 	/login  			for login<br>
 	Call user_login() to login<br>
 	Using session to keep user login status and store user's id<br>
@@ -61,13 +60,12 @@
 4) Unittest<br>
 	serverCopy.py is the copy of the server.py, but serverCopy.py connect to testdb.<br>
 	to do the unittest :<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;createdb testdb<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;psql testdb<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;\i tables.sql<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;\q<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;python serverTest<br>.py<br>
-<br>
-
+		&nbsp;createdb testdb<br>
+		&nbsp;psql testdb<br>
+		&nbsp;\i tables.sql<br>
+		&nbsp;\q<br>
+		&nbsp;&nbsp;python serverTestpy<br>
+<br><br><br><br>
 
 <h2>进度</h2>
 在127.0.0.1:5000中运行，会自动转到注册界面；<br>
